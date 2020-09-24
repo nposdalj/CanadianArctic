@@ -2,7 +2,7 @@ clearvars
 close all
 
 %% Parameters defined by user
-filePrefix = 'CANARC_PI'; % File name to match
+filePrefix = 'CANARC_PI'; % File name to match.
 siteabrev = 'CA'; %abbreviation of site.
 sp = 'Pm'; % your species code
 itnum = '2'; % which iteration you are looking for

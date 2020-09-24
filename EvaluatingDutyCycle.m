@@ -153,7 +153,7 @@ bar(binTable.tbin(binTable.Year ==2016),binTable.Count(binTable.Year ==2016))
 xlim([datetime('08-Aug-2016'),datetime('23-Aug-2016')]); 
 ylim([min(binTable.Count(binTable.Year==2016)) max(binTable.Count(binTable.Year==2016))])
 title('Continuous Data')
-suptitle({'Comparing Click Detections in 5-Minute Bins in 2016:', 'Duty Cycle Regimes vs. Continuous Data'});
+sgtitle({'Comparing Click Detections in 5-Minute Bins in 2016:', 'Duty Cycle Regimes vs. Continuous Data'});
 set(gca, 'YScale', 'log')
 
 %Clicks per day
@@ -174,7 +174,7 @@ bar(dayTable.tbin(dayTable.Year ==2016),dayTable.Count_Click(dayTable.Year ==201
 xlim([datetime('08-Aug-2016'),datetime('23-Aug-2016')]); 
 ylim([min(dayTable.Count_Click(dayTable.Year==2016)) max(dayTable.Count_Click(dayTable.Year==2016))])
 title('Continuous Data')
-suptitle({'Comparing Clicks Detections Per Day in 2016:', 'Duty Cycle Regimes vs. Continuous Data'});
+sgtitle({'Comparing Clicks Detections Per Day in 2016:', 'Duty Cycle Regimes vs. Continuous Data'});
 
 %% Evaluating the duty cycle for 2018 and 2019
 
@@ -268,7 +268,7 @@ xlim([datetime('01-Jul-2018'),datetime('31-Oct-2019')]);
 ylim([min(binTable.Count(binTable.Year== 2018 | 2019)) max(binTable.Count(binTable.Year== 2018 | 2019))])
 set(gca, 'YScale', 'log')
 title('Continuous Data')
-suptitle({'Comparing Clicks Detections in 5-Minute Bins in 2018 and 2019:', 'Duty Cycle Regimes vs. Continuous Data'});
+sgtitle({'Comparing Clicks Detections in 5-Minute Bins in 2018 and 2019:', 'Duty Cycle Regimes vs. Continuous Data'});
 
 %re-time re-sampled data for day data
 out_phase11_dayTable = retime(out_phase11,'daily','sum');
@@ -295,7 +295,7 @@ xlim([datetime('01-Jul-2018'),datetime('31-Oct-2019')]);
 ylim([min(dayTable.Count_Click(dayTable.Year==2019 | 2018)) max(dayTable.Count_Click(dayTable.Year==2019 | 2018))])
 set(gca, 'YScale', 'log')
 title('Continuous Data')
-suptitle({'Comparing Click Detections Per Day in 2018 and 2019:', 'Duty Cycle Regimes vs. Continuous Data'});
+sgtitle({'Comparing Click Detections Per Day in 2018 and 2019:', 'Duty Cycle Regimes vs. Continuous Data'});
 
 %clicks per day
 figure
@@ -315,7 +315,7 @@ bar(dayTable.tbin(dayTable.Year ==2019 | 2018),dayTable.Count_Click(dayTable.Yea
 xlim([datetime('01-Jul-2018'),datetime('31-Oct-2019')]); 
 ylim([min(dayTable.Count_Click(dayTable.Year==2019 | 2018)) max(dayTable.Count_Click(dayTable.Year==2019 | 2018))])
 title('Continuous Data')
-suptitle({'Comparing 5-Min Bin Detections Per Day in 2018 and 2019:', 'Duty Cycle Regimes vs. Continuous Data'});
+sgtitle({'Comparing 5-Min Bin Detections Per Day in 2018 and 2019:', 'Duty Cycle Regimes vs. Continuous Data'});
 
 %% Evaluating duty cycle a different way
 %With this method, you randomly sample 3, 5-minute bins out of every 35 minutes
@@ -505,23 +505,18 @@ binEffort.Year = year(binEffort.tbin);
 binEffort16 = binEffort(find(binEffort.Year == 2016,1,'first'):find(binEffort.Year == 2016,1,'last'),:);
 binEffort16.effortBin = [];
 binEffort16.effortSec = [];
-tbin5 = datetime([vTT(:,1:4), floor(vTT(:,5)/p.binDur)*p.binDur, ...
-    zeros(length(vTT),1)]);
-dt = minutes(5);
-All_2016_Bins = retime(All_2016_Clicks,'regular','linear','TimeStep',dt);
 
-vTT = datevec(All_2016_Clicks.tbin);
-tbin = datetime([vTT(:,1:4), floor(vTT(:,5)/p.binDur)*p.binDur, ...
-    zeros(length(vTT),1)]);
-All2016Clicks = timetable2table(All_2016_Clicks);
-data = table2timetable(All2016Clicks(:,2:end),'RowTimes',tbin);
-data2 = retime(data,'minutely','sum');
+All_2016_Bins = synchronize(binEffort16,All_2016_Clicks,'regular','sum','TimeStep',minutes(5));
 
-data3 = synchronize(binEffort16,All_2016_Clicks,'regular','sum','TimeStep',minutes(5));
+%remove bins with less than 5 clicks for continuous data
+Count2016IDX = (All_2016_Bins.Count < 5);
+All_2016_Bins.Count(Count2016IDX) = 0;
 
-
-
-
+for i = 1:35
+    variableName = ['Count_Sub',num2str(i)];
+    All2016IDX = (All_2016_Bins.(variableName) < 5); %remove anything with less than 5 clicks in a bin
+    All_2016_Bins.(variableName)(All2016IDX) = 0;
+end
 %% Code I didn't use
 %%Equation from Stanistreet et al. 2016
 % %duty cycle information

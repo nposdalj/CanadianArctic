@@ -119,7 +119,7 @@ binMonitEffort = sum(effort.roundbin);
 [er,~] = size(effort.Start);
 
 if er > 1
-    binEffort = intervalToBinTimetabl(effort.Start,effort.End,p); % convert intervals in bins when there is multiple lines of effort
+    binEffort = intervalToBinTimetable(effort.Start,effort.End,p); % convert intervals in bins when there is multiple lines of effort
     %binEffort.sec = binEffort.bin*(p.binDur*60);
 else
     binEffort = intervalToBinTimetable_Only1RowEffort(effort.Start,effort.End,p); % convert intervals in bins when there is only one line of effort

@@ -10,7 +10,7 @@ close all
 %NP
 
 %% Parameters defined by user
-filePrefix = 'CANARC_PI'; % File name to match. 
+filePrefix = 'CANARC_PI'; % File name to match 
 siteabrev = 'CA'; %abbreviation of site.
 sp = 'Pm'; % your species code
 itnum = '2'; % which iteration you are looking for
@@ -466,24 +466,61 @@ clickTable.Properties.VariableNames{'effortBin'} = 'Effort_Bin';
 clickTable.Properties.VariableNames{'effortSec'} = 'Effort_Sec';
 clickTable.maxPP = [];
 
-[cT,~] = size(clickTable);
-newtimes = [1:
+clickTable = timetable2table(clickTable);
+clickTable.Year = year(clickTable.tbin);
 
-%2016
-SubS2016 = []; 
-for i = 1:7:y16-1
-    dataRange = binTable2016(i:i+6,:);
-    SubS = datasample(dataRange,3,'Replace',false);
-    SubS2016 = [SubS2016; SubS];
+clickTable2016 = clickTable(find(clickTable.Year == 2016,1,'first'):find(clickTable.Year == 2016,1,'last'),:);
+clickTable2016.Effort_Bin = [];
+clickTable2016.Effort_Sec = [];
+clickTable2016.Year = [];
+[cT16,~] = size(clickTable2016);
+
+clickTable2016 = table2timetable(clickTable2016);
+
+All_2016_Clicks = [];
+for j = 1:35
+    Sub_2016 = [];
+    for i = j:35:cT16-2
+        cycleRange = i:i+34;
+        columnsToDelete = cycleRange > 312481;
+        cycleRange(columnsToDelete) = [];
+        dataRange = clickTable2016(cycleRange,:);
+        [xx,~] = size(dataRange);
+        if xx < 15
+            SubS = dataRange;
+        else
+            SubS = dataRange(1:15,:);
+        end
+        Sub_2016 = [Sub_2016;SubS];
+    end
+    Sub_2016.Properties.VariableNames{'Count'} = ['Count_Sub',num2str(j)];
+    if j > 1
+        All_2016_Clicks = synchronize(All_2016_Clicks,Sub_2016);
+    else
+        All_2016_Clicks = synchronize(clickTable2016,Sub_2016);
+    end
 end
 
-clickTable(16:(1:20):end,:) = [];
-n = 20;
-d = 35;
-clickTable(mod(1:cT,d)<= n & mod(1:cT,d)>0,:) = [];
+binEffort.Year = year(binEffort.tbin); 
+binEffort16 = binEffort(find(binEffort.Year == 2016,1,'first'):find(binEffort.Year == 2016,1,'last'),:);
+binEffort16.effortBin = [];
+binEffort16.effortSec = [];
+tbin5 = datetime([vTT(:,1:4), floor(vTT(:,5)/p.binDur)*p.binDur, ...
+    zeros(length(vTT),1)]);
+dt = minutes(5);
+All_2016_Bins = retime(All_2016_Clicks,'regular','linear','TimeStep',dt);
 
-newtimes = 1:15
-clickTable2 = retime(clickTable,
+vTT = datevec(All_2016_Clicks.tbin);
+tbin = datetime([vTT(:,1:4), floor(vTT(:,5)/p.binDur)*p.binDur, ...
+    zeros(length(vTT),1)]);
+All2016Clicks = timetable2table(All_2016_Clicks);
+data = table2timetable(All2016Clicks(:,2:end),'RowTimes',tbin);
+data2 = retime(data,'minutely','sum');
+
+data3 = synchronize(binEffort16,All_2016_Clicks,'regular','sum','TimeStep',minutes(5));
+
+
+
 
 %% Code I didn't use
 %%Equation from Stanistreet et al. 2016

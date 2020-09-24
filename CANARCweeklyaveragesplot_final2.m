@@ -1,6 +1,6 @@
 %% 
 %This code was created to plot average click and bin counts of sperm whales
-%in the Canadian Arctic over multiple years and deployments.
+%in the Canadian Arctic over multiple years and deployments
 %09/08/2020
 %NP and CAS
 

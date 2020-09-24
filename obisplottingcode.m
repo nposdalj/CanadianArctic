@@ -17,6 +17,17 @@ LatHappy = T2.latitude; %Happy Whale dataset
 LongHappy = T2.longitude; %Happy Whale
 %%
 %Plotting
+lats = LatCanada;
+longs = LongCanada;
+
+%below is the color of your markers, edit if needed
+C = [1 0 0];
+%size of markers 
+markSize = 80;
+
+
+
+
 %Canadian Wildlife service dataset
 %below is the color of your markers, edit if needed
 C = [1 0 0];
@@ -25,7 +36,7 @@ markSize = 80;
 figure
 gm = geoscatter(LatCanada,LongCanada,markSize,'.','MarkerEdgeColor',C);
 for iSite = 1
-    text(lats(iSite),longs(iSite)-1,labs(iSite),'HorizontalAlignment','right','FontSize',12);
+    text(lats(iSite),longs(iSite)-1);
 end
 
 geobasemap landcover

@@ -517,6 +517,26 @@ for i = 1:35
     All2016IDX = (All_2016_Bins.(variableName) < 5); %remove anything with less than 5 clicks in a bin
     All_2016_Bins.(variableName)(All2016IDX) = 0;
 end
+
+%Average # of bins with sperm whales
+All_2016_Bins{:,2:end}(All_2016_Bins{:,2:end} == 0) = NaN;
+All_2016_Bins.DutyAvg = mean(All_2016_Bins{:,3:end},2,'omitnan');
+All_2016_Bins.Diff = All_2016_Bins.Count - All_2016_Bins.DutyAvg; %The difference in clicks per bin
+All_2016_Bins.Supp = All_2016_Bins.Count./All_2016_Bins.DutyAvg;
+All_2016_Bins.DutyPercent = All_2016_Bins.DutyAvg./All_2016_Bins.Count;
+All_2016_Bins.Adj = All_2016_Bins.DutyAvg .* All_2016_Bins.Supp;
+All_2016_Bins.DiffAdj = All_2016_Bins.Count - All_2016_Bins.Adj;
+
+%Average Duty cycle
+figure
+hist(All_2016_Bins.Diff)
+title('Histogram of Missed Clicks in 5-Minute Bins in 2016')
+xlabel('# of Missed Clicks in Each 5-Min Bin')
+ylabel('Count')
+
+
+%Average # of days with sperm whales 
+
 %% Code I didn't use
 %%Equation from Stanistreet et al. 2016
 % %duty cycle information

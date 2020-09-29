@@ -23,7 +23,7 @@ LongHARP = -76.23
 %below is the color of your markers, edit if needed
 C = [1 0 0];
 B = [0.5 0 0];
-A = [0 1 0.25];
+A = [0 0 0.25];
 %size of markers 
 markSize = 80;
 markSize2 = 170;

@@ -469,6 +469,7 @@ clickTable.maxPP = [];
 clickTable = timetable2table(clickTable);
 clickTable.Year = year(clickTable.tbin);
 
+%2016
 clickTable2016 = clickTable(find(clickTable.Year == 2016,1,'first'):find(clickTable.Year == 2016,1,'last'),:);
 clickTable2016.Effort_Bin = [];
 clickTable2016.Effort_Sec = [];
@@ -519,23 +520,184 @@ for i = 1:35
 end
 
 %Average # of bins with sperm whales
-All_2016_Bins{:,2:end}(All_2016_Bins{:,2:end} == 0) = NaN;
-All_2016_Bins.DutyAvg = mean(All_2016_Bins{:,3:end},2,'omitnan');
-All_2016_Bins.Diff = All_2016_Bins.Count - All_2016_Bins.DutyAvg; %The difference in clicks per bin
-All_2016_Bins.Supp = All_2016_Bins.Count./All_2016_Bins.DutyAvg;
-All_2016_Bins.DutyPercent = All_2016_Bins.DutyAvg./All_2016_Bins.Count;
+%All_2016_Bins{:,2:end}(All_2016_Bins{:,2:end} == 0) = NaN;
+%All_2016_Bins.DutyAvg = mean(All_2016_Bins{:,3:end},2,'omitnan'); %average number of clicks in each bin
+All_2016_Bins.DutyAvg = mean(All_2016_Bins{:,3:end},2);
+All_2016_Bins.Diff = All_2016_Bins.Count - All_2016_Bins.DutyAvg; %average number of missed clicks in each bin
+%what to multiply the duty cycled data by to supplement so it can look like the continuous data
+All_2016_Bins.Supp = All_2016_Bins.Count./All_2016_Bins.DutyAvg; 
+%what does the duty cycle percent look like, compared to the actual duty cycle which was recording 43% of the time
+All_2016_Bins.DutyPercent = All_2016_Bins.DutyAvg./All_2016_Bins.Count; 
+%Multiply the duty cycled average number of clicks in each bin by the
+%'supplement' so you can see what number of clicks you'd have if you
+%recorded continuously
 All_2016_Bins.Adj = All_2016_Bins.DutyAvg .* All_2016_Bins.Supp;
-All_2016_Bins.DiffAdj = All_2016_Bins.Count - All_2016_Bins.Adj;
+All_2016_Bins.DiffAdj = All_2016_Bins.Count - All_2016_Bins.Adj; %sanity check, what's the difference between the 
+%actual recorded number of clicks and the 'adjusted' number of clicks based
+%on the supplemented duty cycled data
 
-%Average Duty cycle
+%Missed Clicks in 5-Minute bins
 figure
-hist(All_2016_Bins.Diff)
+idx = All_2016_Bins.Diff > 0;
+hist(All_2016_Bins.Diff(idx))
 title('Histogram of Missed Clicks in 5-Minute Bins in 2016')
 xlabel('# of Missed Clicks in Each 5-Min Bin')
 ylabel('Count')
 
+%Average Duty cycle
+Mean_2016 = nanmean(All_2016_Bins.DutyPercent);
+Avg2016_DutyCycle = ['The average duty cycle for 2016 was ',num2str(Mean_2016)];
+disp(Avg2016_DutyCycle)
 
 %Average # of days with sperm whales 
+%retime bin table for daily
+columnIndices2Delete = [1 38 39 40 41 42 43];
+All_2016_BinsINT = All_2016_Bins;
+All_2016_BinsINT(:,columnIndices2Delete) = [];
+All_2016_Days = retime(All_2016_BinsINT,'daily','sum');
+
+%recalculate all columns
+%All_2016_Days{:,2:end}(All_2016_Days{:,2:end} == 0) = NaN;
+All_2016_Days.DutyAvg = mean(All_2016_Days{:,3:end},2); %average number of clicks in each bin
+All_2016_Days.Diff = All_2016_Days.Count - All_2016_Days.DutyAvg; %average number of missed clicks in each bin
+%what to multiply the duty cycled data by to supplement so it can look like the continuous data
+All_2016_Days.Supp = All_2016_Days.Count./All_2016_Days.DutyAvg; 
+%what does the duty cycle percent look like, compared to the actual duty cycle which was recording 43% of the time
+All_2016_Days.DutyPercent = All_2016_Days.DutyAvg./All_2016_Days.Count; 
+%Multiply the duty cycled average number of clicks in each bin by the
+%'supplement' so you can see what number of clicks you'd have if you
+%recorded continuously
+All_2016_Days.Adj = All_2016_Days.DutyAvg .* All_2016_Days.Supp;
+All_2016_Days.DiffAdj = All_2016_Days.Count - All_2016_Days.Adj; %sanity check, what's the difference between the 
+%actual recorded number of clicks and the 'adjusted' number of clicks based
+%on the supplemented duty cycled data
+
+%Missed 5-Minute bins each day
+figure
+idx = All_2016_Days.Diff > 0;
+hist(All_2016_Days.Diff(idx))
+title('Histogram of Missed 5-Minute Bins each day in 2016')
+xlabel('# of Missed 5-Min Bins Each Day')
+ylabel('Count')
+
+%Average Duty cycle
+Mean_2016 = nanmean(All_2016_Days.DutyPercent);
+Avg2016_DutyCycle = ['The average duty cycle for 2016 was ',num2str(Mean_2016)];
+disp(Avg2016_DutyCycle)
+
+%2018/2019 deployment
+clickTable20189 = clickTable(find(clickTable.Year == 2018,1,'first'):find(clickTable.Year == 2019,1,'last'),:);
+clickTable20189.Effort_Bin = [];
+clickTable20189.Effort_Sec = [];
+clickTable20189.Year = [];
+[cT189,~] = size(clickTable20189);
+
+clickTable20189 = table2timetable(clickTable20189);
+
+All_20189_Clicks = [];
+for j = 1:35
+    Sub_20189 = [];
+    for i = j:35:cT189-2
+        cycleRange = i:i+34;
+        columnsToDelete = cycleRange > 549204;
+        cycleRange(columnsToDelete) = [];
+        dataRange = clickTable20189(cycleRange,:);
+        [xx,~] = size(dataRange);
+        if xx < 15
+            SubS = dataRange;
+        else
+            SubS = dataRange(1:15,:);
+        end
+        Sub_20189 = [Sub_20189;SubS];
+    end
+    Sub_20189.Properties.VariableNames{'Count'} = ['Count_Sub',num2str(j)];
+    if j > 1
+        All_20189_Clicks = synchronize(All_20189_Clicks,Sub_20189);
+    else
+        All_20189_Clicks = synchronize(clickTable20189,Sub_20189);
+    end
+end
+
+binEffort.Year = year(binEffort.tbin); 
+binEffort189 = binEffort(find(binEffort.Year == 2018,1,'first'):find(binEffort.Year == 2019,1,'last'),:);
+binEffort189.effortBin = [];
+binEffort189.effortSec = [];
+
+All_20189_Bins = synchronize(binEffort189,All_20189_Clicks,'regular','sum','TimeStep',minutes(5));
+
+%remove bins with less than 5 clicks for continuous data
+Count20189IDX = (All_20189_Bins.Count < 5);
+All_20189_Bins.Count(Count20189IDX) = 0;
+
+for i = 1:35
+    variableName = ['Count_Sub',num2str(i)];
+    All20189IDX = (All_20189_Bins.(variableName) < 5); %remove anything with less than 5 clicks in a bin
+    All_20189_Bins.(variableName)(All20189IDX) = 0;
+end
+
+%Average # of bins with sperm whales
+All_20189_Bins.DutyAvg = mean(All_20189_Bins{:,3:end},2);
+All_20189_Bins.Diff = All_20189_Bins.Count - All_20189_Bins.DutyAvg; %average number of missed clicks in each bin
+%what to multiply the duty cycled data by to supplement so it can look like the continuous data
+All_20189_Bins.Supp = All_20189_Bins.Count./All_20189_Bins.DutyAvg; 
+%what does the duty cycle percent look like, compared to the actual duty cycle which was recording 43% of the time
+All_20189_Bins.DutyPercent = All_20189_Bins.DutyAvg./All_20189_Bins.Count; 
+%Multiply the duty cycled average number of clicks in each bin by the
+%'supplement' so you can see what number of clicks you'd have if you
+%recorded continuously
+All_20189_Bins.Adj = All_20189_Bins.DutyAvg .* All_20189_Bins.Supp;
+All_20189_Bins.DiffAdj = All_20189_Bins.Count - All_20189_Bins.Adj; %sanity check, what's the difference between the 
+%actual recorded number of clicks and the 'adjusted' number of clicks based
+%on the supplemented duty cycled data
+
+%Missed Clicks in 5-Minute bins
+figure
+idx = All_20189_Bins.Diff > 0;
+hist(All_20189_Bins.Diff(idx))
+title('Histogram of Missed Clicks in 5-Minute Bins in 2018/2019')
+xlabel('# of Missed Clicks in Each 5-Min Bin')
+ylabel('Count')
+
+%Average Duty cycle
+Mean_20189 = nanmean(All_20189_Bins.DutyPercent);
+Avg20189_DutyCycle = ['The average duty cycle for 2018/2019 was ',num2str(Mean_20189)];
+disp(Avg20189_DutyCycle)
+
+%Average # of days with sperm whales 
+%retime bin table for daily
+columnIndices2Delete = [1 38 39 40 41 42 43];
+All_20189_BinsINT = All_20189_Bins;
+All_20189_BinsINT(:,columnIndices2Delete) = [];
+All_20189_Days = retime(All_20189_BinsINT,'daily','sum');
+
+%recalculate all columns
+%All_2016_Days{:,2:end}(All_2016_Days{:,2:end} == 0) = NaN;
+All_20189_Days.DutyAvg = mean(All_20189_Days{:,3:end},2); %average number of clicks in each bin
+All_20189_Days.Diff = All_20189_Days.Count - All_20189_Days.DutyAvg; %average number of missed clicks in each bin
+%what to multiply the duty cycled data by to supplement so it can look like the continuous data
+All_20189_Days.Supp = All_20189_Days.Count./All_20189_Days.DutyAvg; 
+%what does the duty cycle percent look like, compared to the actual duty cycle which was recording 43% of the time
+All_20189_Days.DutyPercent = All_20189_Days.DutyAvg./All_20189_Days.Count; 
+%Multiply the duty cycled average number of clicks in each bin by the
+%'supplement' so you can see what number of clicks you'd have if you
+%recorded continuously
+All_20189_Days.Adj = All_20189_Days.DutyAvg .* All_20189_Days.Supp;
+All_20189_Days.DiffAdj = All_20189_Days.Count - All_20189_Days.Adj; %sanity check, what's the difference between the 
+%actual recorded number of clicks and the 'adjusted' number of clicks based
+%on the supplemented duty cycled data
+
+%Missed 5-Minute bins each day
+figure
+idx = All_20189_Days.Diff > 0;
+hist(All_20189_Days.Diff(idx))
+title('Histogram of Missed 5-Minute Bins each day in 2018/2019')
+xlabel('# of Missed 5-Min Bins Each Day')
+ylabel('Count')
+
+%Average Duty cycle
+Mean_20189 = nanmean(All_20189_Days.DutyPercent);
+Avg20189_DutyCycle = ['The average duty cycle for 2018/2019 was ',num2str(Mean_20189)];
+disp(Avg20189_DutyCycle)
 
 %% Code I didn't use
 %%Equation from Stanistreet et al. 2016

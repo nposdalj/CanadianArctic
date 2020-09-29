@@ -36,6 +36,7 @@ geobasemap landcover
 hold on
 geoscatter(LatHARP,LongHARP,markSize2,'.','MarkerEdgeColor',A);
 geobasemap landcover
+legend('Canada Dataset','Happy Whale','HARP')
 hold off
 
 

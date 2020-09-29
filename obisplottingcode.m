@@ -26,6 +26,7 @@ B = [0.5 0 0];
 A = [0 1 0.25];
 %size of markers 
 markSize = 80;
+markSize2 = 170;
 figure
 geoscatter(LatCanada,LongCanada,markSize,'.','MarkerEdgeColor',C);
 geobasemap landcover
@@ -33,7 +34,7 @@ hold on
 geoscatter(LatHappy,LongHappy,markSize,'.','MarkerEdgeColor',B);
 geobasemap landcover
 hold on
-geoscatter(LatHARP,LongHARP,markSize,'.','MarkerEdgeColor',A);
+geoscatter(LatHARP,LongHARP,markSize2,'.','MarkerEdgeColor',A);
 geobasemap landcover
 hold off
 

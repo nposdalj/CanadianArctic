@@ -1,5 +1,4 @@
 %This code is used to plot data from OBIS Seamap.
-%Created by CS
 
 T = readtable('obis_seamap_dataset_280_points_csv.csv'); %Dataset 1 (Canadian Wildlife Service 1970s-1980s)
 
@@ -15,32 +14,29 @@ LongCanada = table.longitude; %Canadian
 
 LatHappy = T2.latitude; %Happy Whale dataset
 LongHappy = T2.longitude; %Happy Whale
+
+LatHARP = 72.72
+LongHARP = -76.23
 %%
 %Plotting
-lats = LatCanada;
-longs = LongCanada;
-
-%below is the color of your markers, edit if needed
-C = [1 0 0];
-%size of markers 
-markSize = 80;
-
-
-
-
 %Canadian Wildlife service dataset
 %below is the color of your markers, edit if needed
 C = [1 0 0];
+B = [0.5 0 0];
+A = [0 0 0.25];
 %size of markers 
 markSize = 80;
+markSize2 = 170;
 figure
 geoscatter(LatCanada,LongCanada,markSize,'.','MarkerEdgeColor',C);
-for iSite = 1
-    text(lats(iSite),longs(iSite)-1);
-end
-hold on
-geoscatter(LatHappy,LongHappy,markSize,'.','MarkerEdgeColor',b);
 geobasemap landcover
-
+hold on
+geoscatter(LatHappy,LongHappy,markSize,'.','MarkerEdgeColor',B);
+geobasemap landcover
+hold on
+geoscatter(LatHARP,LongHARP,markSize2,'.','MarkerEdgeColor',A);
+geobasemap landcover
+legend('Canada Dataset','Happy Whale','HARP')
+hold off
 
 

@@ -195,13 +195,14 @@ dayTable.Effort_Bin(:) = 96; %for CORC ONLY - only 0.33 of each hour is recorded
 %so effort of 5 min bins for each day is 96
     else
 if strcmp(siteabrev,'CA');
-    ge = dayTable.Effort_Bin(435:603); %bin effort (excluding ships but not considering duty cycle)
-    geDiff = ge - 288;
-    ge(ge >123) = 123;
-    ge = ge + geDiff;
-    dayTable.Effort_Bin(435:603) = ge; %for CANARC_PI_03 ONLY - only 25.7(or 25%) mins of each hour is recorded....
-    %so effort of 5 bins for each day is
-    secADJ = 123 * 60; %123 5-min bins a day converted into seconds
+%     ge = dayTable.Effort_Bin(435:603); %bin effort (excluding ships but not considering duty cycle)
+%     geDiff = ge - 288;
+%     ge(ge >123) = 123;
+%     ge = ge + geDiff;
+%     dayTable.Effort_Bin(435:603) = ge; %for CANARC_PI_03 ONLY - only 25.7(or 25%) mins of each hour is recorded....
+%     %so effort of 5 bins for each day is
+%     secADJ = 123 * 60; %123 5-min bins a day converted into seconds
+dayTable.Count_Bin(435:603) = floor(dayTable.Count_Bin(435:603)*2.3784);
     else
 dayTable.MaxEffort_Bin = ones(pp,1)*(288);
 end

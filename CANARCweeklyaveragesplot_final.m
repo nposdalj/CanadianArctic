@@ -8,12 +8,12 @@ close all
 clear all
 
 %% Specity directories
-Site1Dir = 'H:\Project Sites\CANARC\TPWS_120to125'; %TPWS directory for site 1
+Site1Dir = 'E:\Project_Sites\CANARC\TPWS_120to125'; %TPWS directory for site 1
 filePrefix = 'CANARC_PI'; %site name for plots
 itnum = '2'; %which iteration of TPWS are you looking for
 sp = 'Pm'; %species code
 
-SaveDir = 'G:\Project Sites\CANARC\Plots'; %save plots
+SaveDir = 'E:\Project_Sites\CANARC\Plots'; %save plots
 p = sp_setting_defaults('sp',sp,'analysis','SumPPICIBin'); 
 %% define subfolder that fit specified iteration
 %Site 1

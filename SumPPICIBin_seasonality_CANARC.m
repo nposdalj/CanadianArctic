@@ -3,16 +3,16 @@ close all
 
 %% Parameters defined by user
 filePrefix = 'CANARC_PI'; % File name to match
-siteabrev = 'CA'; %abbreviation of site.
+siteabrev = 'CANARC'; %abbreviation of site.
 sp = 'Pm'; % your species code
 itnum = '2'; % which iteration you are looking for
 srate = 200; % sample rate
 tpwsPath = 'E:\Project_Sites\CANARC\TPWS_120to125'; %directory of TPWS files
 effortXls = 'E:\Project_Sites\CANARC\Pm_Effort.xlsx'; % specify excel file with effort times
-saveDir = 'E:\Seasonality\CANARC'; %specify directory to save files
-manualDir = 'E:\Project_Sites\CANARC\guysbight_log.xls'; %location of manual logging for Guys Bight
+saveDir = 'E:\Project_Sites\CANARC'; %specify directory to save files
+manualDir = 'E:\Project_Sites\CANARC\guysbight_log2.xls'; %location of manual logging for Guys Bight
+manualEffort = 'E:\Project_Sites\CANARC\GuysBight_Effort.xlsx'; %location of Guys Bight effort
 PlotSiteName = 'Pond Inlet in the Canadian Arctic';
-
 %% define subfolder that fit specified iteration
 if itnum > 1
    for id = 2: str2num(itnum) % iterate id times according to itnum
@@ -120,25 +120,27 @@ binMonitEffort = sum(effort.roundbin);
 
 if er > 1
     binEffort = intervalToBinTimetable(effort.Start,effort.End,p); % convert intervals in bins when there is multiple lines of effort
-    %binEffort.sec = binEffort.bin*(p.binDur*60);
+    binEffort.sec = binEffort.bin*(p.binDur*60);
 else
     binEffort = intervalToBinTimetable_Only1RowEffort(effort.Start,effort.End,p); % convert intervals in bins when there is only one line of effort
-    %binEffort.sec = binEffort.bin*(p.binDur*60);
+    binEffort.sec = binEffort.bin*(p.binDur*60);
 end
 %% get average of detection by effort
 NktTkt = positiveCounts/secMonitEffort;
 NktTktbin = positiveBins/binMonitEffort;
 %% save workspace to avoid running previous parts again
-save([saveDir,'\',siteabrev,'_workspace130.mat']);
+save([saveDir,'\',siteabrev,'_workspace125.mat']);
 %% load workspace
-load([saveDir,'\',siteabrev,'_workspace130.mat']);
+load([saveDir,'\',siteabrev,'_workspace125.mat']);
 %% group data by 5min bins, days, weeks, and seasons
 %group data by 5 minute bins
+binidx = (binData.Count >=5); %removes bins with less than 5 clicks
+binData.Count(binidx == 0) = NaN;
 binTable = synchronize(binData,binEffort);
-binTable.Properties.VariableNames{'effortBin'} = 'Effort_Bin';
-binTable.Properties.VariableNames{'effortSec'} = 'Effort_Sec';
+binTable.Properties.VariableNames{'bin'} = 'Effort_Bin';
+binTable.Properties.VariableNames{'sec'} = 'Effort_Sec';
 binTable.maxPP = [];
-binidx1 = (binTable.Count >= 1);
+binidx1 = (binTable.Count >= 5);
 [y,~]=size(binTable);
 binTable.PreAbs = zeros(y,1);
 binTable.PreAbs(binidx1) = 1; %table with 0 for no presence in 5min bin and 1 with presence in 5min bin
@@ -152,65 +154,37 @@ dayData = synchronize(Click,Bin);
 dayEffort = retime(binEffort,'daily','sum');
 dayTab = synchronize(dayData,dayEffort);
 dayTable = synchronize(dayData,dayEffort);
-dayTable.Properties.VariableNames{'effortBin'} = 'Effort_Bin';
-dayTable.Properties.VariableNames{'effortSec'} = 'Effort_Sec';
+dayTable.Properties.VariableNames{'bin'} = 'Effort_Bin';
+dayTable.Properties.VariableNames{'sec'} = 'Effort_Sec';
 dayTableZeros = dayTable;
 dayTable(~dayTable.Effort_Bin,:)=[]; %removes days with no effort, NOT days with no presence
-
-%group data by week
-weekData = retime(dayData,'weekly','mean');
-weekEffort = retime(binEffort,'weekly','sum');
-weekTable = retime(dayTable,'weekly','sum');
-%weekTable(~weekTable.Effort_Bin,:)=[]; %removes days with no effort, NOT days with no presence
-
-%group data by month
-monthData = retime(dayData, 'monthly', 'mean');
-monthEffort = retime(binEffort,'monthly','sum');
-monthTable = retime(dayTable, 'monthly','sum');
-monthTable(~monthTable.Effort_Bin,:)=[]; %removes days with no effort, NOT days with no presence
 %% statistical methods from Diogou, et al. 2019 - by daily 5 min bins ** USE THIS **
 [pp,~]=size(dayTable);
 dayTable.MaxEffort_Bin = ones(pp,1)*(288); %total number of bins possible in one day
 dayTable.MaxEffort_Sec = ones(pp,1)*(86400); %seconds in one day
 
-%dealing with duty cycled data
-if strcmp(siteabrev,'CB');
-dayTable.Effort_Bin(222:507) = 127;%for CB02 ONLY - only .44 of each hour is recorded...
-%so effort of 5 min bins for each day is 127 bins
-    else 
-if strcmp(siteabrev,'QC');
-dayTable.Effort_Bin(1:289) = 36; %for QC06 ONLY - only 7.5 mins each hour is recorded...
-%so effort of 5 min bins for each day is 36
-    else
-if strcmp(siteabrev,'ALEUT');
-dayTable.Effort_Bin(274:end) = 96; %for ALEUT03BD ONLY - only 0.33 of each hour is recorded...
-%so effort of 5 min bins for each day is 96
-    else
-if strcmp(siteabrev,'HOKE');
-dayTable.Effort_Bin(:) = 36; %for HOKE ONLY - only 7.5 mins each hour is recorded...
-%so effort of 5 min bins for each day is 36
-    else
-if strcmp(siteabrev,'CORC');
-dayTable.Effort_Bin(:) = 96; %for CORC ONLY - only 0.33 of each hour is recorded...
-%so effort of 5 min bins for each day is 96
-    else
-if strcmp(siteabrev,'CA');
-%     ge = dayTable.Effort_Bin(435:603); %bin effort (excluding ships but not considering duty cycle)
-%     geDiff = ge - 288;
-%     ge(ge >123) = 123;
-%     ge = ge + geDiff;
-%     dayTable.Effort_Bin(435:603) = ge; %for CANARC_PI_03 ONLY - only 25.7(or 25%) mins of each hour is recorded....
-%     %so effort of 5 bins for each day is
-%     secADJ = 123 * 60; %123 5-min bins a day converted into seconds
-dayTable.Count_Bin(435:603) = floor(dayTable.Count_Bin(435:603)*2.3784);
-    else
-dayTable.MaxEffort_Bin = ones(pp,1)*(288);
+%dealing with duty cycled data; supplementing the data
+if strcmp(siteabrev,'CANARC');
+     ge = dayTable.Effort_Bin(435:603); %bin effort (excluding ships but not considering duty cycle)
+     ge = ge/288; %proportion of data that was not 'ships' considering full recording effort
+     dayTable.Effort_Bin(435:603) = ge * 123.264; 
+     
+%      geDiff = ge - 288; %find how many bins were excluded because of ships
+%      geDuty = 123.264 + geDiff; %subtract the bins excluded from ships, from 123 (max effort of bins with the duty cycle)
+%      geDuty = max(geDuty,0); %make any negative values zero
+%      dayTable.Effort_Bin(435:603) = geDuty; %for CANARC_PI_03 ONLY - only 25.7(or 25%) mins of each hour is recorded....
+     dayTable.MaxEffort_Bin(435:603) = 123.264;
+     dayTable.MaxEffort_Sec(435:603) = 123.264 * 5 * 60;
+     dayTable.Effort_Sec(435:603) = dayTable.Effort_Bin(435:603) * 5 * 60;
+     %dayTable.Count_Bin(435:603) = floor(dayTable.Count_Bin(435:603)*2.3784); %adjusted the bin count to match the duty cycle
+else
+    dayTable.MaxEffort_Bin = ones(pp,1)*(288);
 end
-end
-end
-end
-end
-end
+
+%Calcuates proportion of recording hours with clicks
+dayTable.Minutes = dayTable.Count_Bin * 5; %convert bins to minutes
+dayTable.Hours = (dayTable.Count_Bin * 5) ./ 60; %convert the number of bins sperm whales were detected in to hours per day
+dayTable.HoursProp = dayTable.Hours./(dayTable.Effort_Sec ./ (60 * 60)); %proportion of hours per day w/clicks
 
 dayTable.NormEffort_Bin = dayTable.Effort_Bin./dayTable.MaxEffort_Bin; %what proportion of the day was there effort
 dayTable.NormEffort_Sec = dayTable.Effort_Sec./dayTable.MaxEffort_Sec; %what proportion of the day was there effort
@@ -230,63 +204,45 @@ dayTable.Season(fallidxD) = 2;
 dayTable.Season(winteridxD) = 3;
 dayTable.Season(springidxD) = 4;
 
+%add year and day to data
+dayTable.Year = year(dayTable.tbin); 
+dayTable.day = day(dayTable.tbin,'dayofyear');
+
 NANidx = ismissing(dayTable(:,{'NormBin'}));
 dayTable{:,{'NormBin'}}(NANidx) = 0; %if there was effort, but no detections change the NormBin column to zero
 dayBinTAB = timetable2table(dayTable);
-writetable(dayBinTAB,[saveDir,'\',siteabrev,'_dayBinTAB130.csv']); %save table to .csv to continue stats in R F:\Seasonality\Kruskal_RankSumSTATS.R
-weekBinTAB = timetable2table(weekTable);
-weekBinTAB.week = week(weekBinTAB.tbin);
-writetable(weekBinTAB,[saveDir,'\',siteabrev,'_weekBinTAB130.csv']);
-
-KW_BINS = kruskalwallis(dayTable.NormBin,dayTable.Season); %Kruskalwallis test for bin presence based on season (bins)
-KW_CLICKS = kruskalwallis(dayTable.NormClick, dayTable.Season); %Kruskalwallis test for bin presence based on season (clicks)
-%% day table with days grouped together (summed and averaged) ** USE THIS **
-dayTable.month = month(dayTable.tbin);
-dayTable.day = day(dayTable.tbin,'dayofyear');
-[MD,~] = findgroups(dayTable.day);
-%dayTable.MD = MD; %adds a column that has the day of the year without months or years (i.e. January 1st = 1)
-dayTable.day = categorical(dayTable.day);
-
-if length(MD) < 365
-    meantab365 = table(dayTable.day(:), dayTable.NormBin(:));
-    meantab365.Properties.VariableNames = {'Day' 'Bin'};
-    sumtab365 = meantab365;
-else
-%sum
-sumarray = grpstats(dayTable.NormBin, dayTable.day, @sum); %takes the sum of each day of the year
-sumtable = array2table(sumarray);
-newcol = (1:length(sumarray))';
-sumarray365 = [newcol sumarray];
-sumtab365 = array2table(sumarray365);
-sumtab365.Properties.VariableNames = {'Day' 'Bin'};
-
-%mean
-meanarray = grpstats(dayTable.NormBin, dayTable.day, @mean); %takes the mean of each day of the year
-meantable = array2table(meanarray);
-newcol_mean = (1:length(meanarray))';
-meanarray365 = [newcol_mean meanarray];
-meantab365 = array2table(meanarray365);
-meantab365.Properties.VariableNames = {'Day' 'Bin'};
-end
-
-writetable(meantab365, [saveDir,'\',siteabrev,'_days365GroupedMean130.csv']); %table with the mean for each day of the year
-writetable(sumtab365, [saveDir,'\',siteabrev,'_days365GroupedSum130.csv']); %table with the sum for each day of the year
-%save table to .csv to continue stats in R F:\Seasonality\Kruskal_RankSumSTATS.R
-%% day table with months grouped together (summed and averaged) ** USE THIS **
-dayTable.month = month(dayTable.tbin);
-[MO,~] = findgroups(dayTable.month);
-dayTable.month = categorical(dayTable.month);
-MOT = table(dayTable.NormBin,dayTable.month);
-
-%mean
-meantabMO = grpstats(MOT, 'Var2');
-meantabMO.Properties.VariableNames = {'Month' 'Bin' 'Mean'};
-
-writetable(meantabMO, [saveDir,'\',siteabrev,'_MOGroupedMean130.csv']); %table with the mean for each day of the year
-
+writetable(dayBinTAB,[saveDir,'\',siteabrev,'_dayBinTAB125.csv']); %save table to .csv to continue stats in R F:\Seasonality\Kruskal_RankSumSTATS.R
 %% Loading the manual data from Guys Bight
-
 manDet = readtable(manualDir); %read manual detections as table
+
+%dealing with effort for manual data
+manEff = readtable(manualEffort); %read Guys Bight effort as table
+manEff.Properties.VariableNames = {'Sites','Deployments','Start','End'};
+Start_man = datetime(manEff.Start,'ConvertFrom','datenum');
+End_man = datetime(manEff.End,'ConvertFrom','datenum');
+effort_man = timetable(Start_man,End_man);
+%group effort in bins
+effort_man.diffSec = seconds(effort_man.End_man-effort_man.Start_man);
+effort_man.bins = effort_man.diffSec/(60*p.binDur);
+effort_man.roundbin = round(effort_man.diffSec/(60*p.binDur));
+secMonitEffort = sum(effort_man.diffSec);
+binMonitEffort = sum(effort_man.roundbin);
+binEffort_man = intervalToBinTimetable_Only1RowEffort(effort_man.Start_man,effort_man.End_man,p); % convert intervals in bins when there is only one line of effort
+binEffort_man.sec = binEffort_man.bin*(p.binDur*60);
+binEffort_day = retime(binEffort_man,'daily','sum');
+
+%Calculating Recording Effort for Guys Bight
+%recorded for 5 minutes, off for 60 minutes
+dailyPercentage_recording = 5/60;
+minsPERday = 24 * 60 * dailyPercentage_recording; %minutes per day with recording effort
+secPERday = minsPERday * 60; %seconds per day with recording effort
+binsPERday = minsPERday/5; %number of 5 min bins per day
+
+%Since the data is duty cycled 5/60, I'm going to adjust the effort for bin
+%and sec per day
+binEffort_day.bin = binEffort_day.bin*dailyPercentage_recording;
+binEffort_day.sec = binEffort_day.sec*dailyPercentage_recording;
+
 manDet.StartTime = datetime(manDet.StartTime,'ConvertFrom','excel'); %convert times to matlab time
 manDet.EndTime = datetime(manDet.EndTime,'ConvertFrom','excel'); %convert times to matlab time
 manDet.Parameter1 = manDet.StartTime - manDet.EndTime;
@@ -295,15 +251,36 @@ manDet(:,1:4) = [];
 manDet(:,3:end) = [];
 manDet.Diff = minutes(manDet.StartTime - manDet.EndTime);
 manDet.Bins = abs(floor(manDet.Diff/5));
+manDet.Properties.VariableNames = {'tbin', 'EndTime', 'Diff', 'Count_Bin'};
+manDet.EndTime = [];
+manDet.Diff = [];
+manDet = retime(table2timetable(manDet),'daily','sum');
 
-manDet2 = table2timetable(manDet);
-manDet2.EndTime = [];
-manDet2.Diff = [];
-manDet2 = retime(manDet2,'weekly','sum');
-manDet2.Properties.VariableNames = {'Count_Bin'};
+manDet = synchronize(manDet,binEffort_day); %group manual detections and effort
+manDet.Properties.VariableNames = {'Count_Bin','Effort_Bin','Effort_Sec'};
+manDet.Minutes = manDet.Count_Bin * 5; %convert bins to minutes
+manDet.Hours = (manDet.Count_Bin * 5) ./ 60; %convert the number of bins sperm whales were detected in to hours per day
+manDet.HoursProp = manDet.Hours./(manDet.Effort_Sec ./ (60 * 60)); %proportion of hours per day w/clicks
+manDet.month = month(manDet.tbin);
+manDet.Year = year(manDet.tbin);
+manDet.day = day(manDet.tbin,'dayofyear');
 
-weekTable2 = synchronize(manDet2,weekTable);
-
+columns2delete = [1 5 6 10 11 12 13 14];
+dayTable(:,columns2delete) = [];
+dayTable2 = [manDet; dayTable];
+%% Daily Table
+dayTable2.Percent = dayTable2.Effort_Sec./86400;
+figure
+yyaxis left
+bar(dayTable2.tbin,dayTable2.HoursProp,'k')
+title('Proportion of Hours Per Day with Sperm Whales at Pond Inlet in the Canadian Arctic')
+ylabel('Propertion of Hours/Day')
+yyaxis right
+plot(dayTable2.tbin, dayTable2.Percent, '.r')
+ylabel('Percent Effort')
+ylim([-0.01 1.01])
+col = [0 0 0];
+set(gcf,'defaultAxesColorOrder',[col;col])
 %%
 weekTable.Percent = weekTable.Effort_Sec./604800
 figure
@@ -316,9 +293,9 @@ bar(manDet2.StartTime,manDet2.Count_Bin,'k')
 yyaxis right
 plot(weekTable.tbin,weekTable.Percent,'.r')
 ylabel('Percent Effort')
+ylim([0 1.01])
 col = [0 0 0];
 set(gcf,'defaultAxesColorOrder',[col;col])
-
 %% Weekly group and click count with percent effort reported
 weekTable.Percent = (weekTable.Effort_Sec./604800)*100;
 figure(6); set(6, 'name','Weekly presence')

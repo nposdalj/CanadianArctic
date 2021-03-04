@@ -13,6 +13,7 @@ saveDir = 'E:\Project_Sites\CANARC'; %specify directory to save files
 manualDir = 'E:\Project_Sites\CANARC\guysbight_log2.xls'; %location of manual logging for Guys Bight
 manualEffort = 'E:\Project_Sites\CANARC\GuysBight_Effort.xlsx'; %location of Guys Bight effort
 PlotSiteName = 'Pond Inlet in the Canadian Arctic';
+IceData = 'C:\Users\nposd\Documents\GitHub\CanadianArctic\SeaIceData_BaffinBay.csv'
 %% define subfolder that fit specified iteration
 if itnum > 1
    for id = 2: str2num(itnum) % iterate id times according to itnum
@@ -268,6 +269,16 @@ manDet.day = day(manDet.tbin,'dayofyear');
 columns2delete = [1 5 6 10 11 12 13 14];
 dayTable(:,columns2delete) = [];
 dayTable2 = [manDet; dayTable];
+
+%summarize data weekly
+weekTable = retime(dayTable2,'weekly','mean');
+weekTable2 = retime(dayTable2,'weekly','sum');
+
+%summmarize data monthly
+monthTable = retime(dayTable2,'monthly','mean');
+monthTable2 = retime(dayTable2,'monthly','sum');
+monthTable.Year = year(monthTable.tbin);
+monthTable.month = month(monthTable.tbin);
 %% Daily Table
 dayTable2.Percent = dayTable2.Effort_Sec./86400;
 figure
@@ -281,28 +292,62 @@ ylabel('Percent Effort')
 ylim([-0.01 1.01])
 col = [0 0 0];
 set(gcf,'defaultAxesColorOrder',[col;col])
-%%
-weekTable.Percent = weekTable.Effort_Sec./604800
+%% Weekly Table
+weekTable.Percent = weekTable2.Effort_Sec./604800
 figure
 yyaxis left
-bar(weekTable.tbin,weekTable.Count_Bin,'k')
-title('Average Weekly Presence of Sperm Whales at Pond Inlet in the Canadian Arctic')
-ylabel('Average # of 5-Minute Bins')
-hold on
-bar(manDet2.StartTime,manDet2.Count_Bin,'k')
+bar(weekTable.tbin,weekTable.HoursProp,'k')
+title('Average Proportion of Hours Per Week with Sperm Whales at Pond Inlet in the Canadian Arctic')
+ylabel('Proportion of Hours/Week')
 yyaxis right
 plot(weekTable.tbin,weekTable.Percent,'.r')
 ylabel('Percent Effort')
-ylim([0 1.01])
+ylim([-0.01 1.01])
 col = [0 0 0];
 set(gcf,'defaultAxesColorOrder',[col;col])
+%% loading Ice data
+Ice = readtable(IceData);
+Ice.Year = floor(Ice.Date/100);
+Ice.month = floor(Ice.Date-Ice.Year*100);
+monthTable_Ice = join(monthTable, Ice);
+%% Monthly Plot - 2 axis
+monthTable.Percent = monthTable2.Effort_Sec./2628288;
+monthTable.Percent(isnan(monthTable.Percent))=0;
+monthTable.EffortPlot = 1-monthTable.Percent;
+maxx = max(monthTable_Ice.Value);
+Index_effort = monthTable.Percent >= 1;
+monthTable.Percent(Index_effort) = 1;
+% figure(5); set(5,'name','Monthly presence','DefaultAxesColor',[.8 .8 .8]) 
+% set(gca,'defaultAxesColorOrder',[0 0 0; 0 0 0]);
+figure
+% yyaxis left
+bar(monthTable.tbin,monthTable.HoursProp,'k')
+addaxis(monthTable_Ice.tbin,monthTable_Ice.Value,[0 1.2])
+addaxis(monthTable.tbin,monthTable.Percent,[-0.01 1.01],'.r');
+addaxislabel(1,'Average Proportion of Hours/Week')
+addaxislabel(2,'Sea Ice Extent (million square km)')
+addaxislabel(3,'Percent Effort')
+xlim([min(monthTable.tbin) max(monthTable.tbin)])
+title({'Average Proportion of Hours Per Month with Sperm Whales','at Pond Inlet in the Canadian Arctic'})
+col = [0 0 0];
+set(gcf,'defaultAxesColorOrder',[col;col])
+monthly_Ice = [filePrefix,'_',p.speName,'monthlyPresence_seaIceExtent'];
+saveas(gcf,fullfile(saveDir,monthly_Ice),'png')
+ %% Monthly Plotlyyy with 3 y-axis
+% monthTable_Ice.Percent = monthTable.Percent;
+% figure
+% ylabels{1} = 'Average Proportion of Hours';
+% ylabels{2} = 'Percent Effort';
+% ylabels{3} = 'Sea Ice Extent';
+% [ax,hlines] = plotyyy(monthTable_Ice.tbin,monthTable_Ice.HoursProp,monthTable_Ice.tbin,monthTable_Ice.Percent,monthTable_Ice.tbin,monthTable_Ice.Value)
+% legend(hlines,'y = Average Proportion of Hours','y = Percent Effort','y = Sea Ice Extent')
 %% Weekly group and click count with percent effort reported
 weekTable.Percent = (weekTable.Effort_Sec./604800)*100;
 figure(6); set(6, 'name','Weekly presence')
 set(gca,'defaultAxesColorOrder',[0 0 0;0 0 0]);
 subplot(2,1,1);
 yyaxis left
-bar(weekTable.tbin,weekTable.Count_Click,'k')
+bar(weekTable.tbin,weekTable.HoursProp,'k')
 xlim([weekTable.tbin(1) weekTable.tbin(end)])
 title({'Average Weekly Presence of Sperm Whales', ['at ' PlotSiteName]})
 ylabel({'Weekly Mean'; 'of clicks per day'});

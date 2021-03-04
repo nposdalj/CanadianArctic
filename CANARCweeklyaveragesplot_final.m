@@ -23,8 +23,6 @@ if itnum > 1
        Site1Dir = (fullfile(Site1Dir,subfolder));
    end
 end
-
-
 %% Find all TPWS files that fit your specifications (does not look in subdirectories)
 % Concatenate parts of file name
 detfn = [sp,'.*TPWS',itnum,'.mat'];
@@ -61,30 +59,19 @@ parfor idsk = 1 : length(concatFiles1)
     ici = diff(MTT)*24*60*60*1000; % in ms
     ICIall1 = [ICIall1;[ici; nan]];  % group inter-click interval
 end
-
-
-
 %% After parfor data may not be sorted. Sort all the variables. Site 1
 [~,sorted] = sort(TTall1);
 TTall1  = TTall1(sorted);
 PPall1 = PPall1(sorted);
 ICIall1 = ICIall1(sorted);
-
-
 %% Create timetable per click for Site 1 
 tbin1 = datetime(TTall1,'ConvertFrom','datenum');
 clickData1 = timetable(tbin1,PPall1,ICIall1);
 clear tbin1
-
-
-
 %% Convert times to bin vector times for Site 1 (STARTED HERE 6/26)
 vTT1 = datevec(TTall1);
 tbin1 = datetime([vTT1(:,1:4), floor(vTT1(:,5)/p.binDur)*p.binDur, ...
     zeros(length(vTT1),1)]);
-
-
-
 %% create table and get click counts and max pp per bin for Site 1
 data1 = timetable(tbin1,TTall1,PPall1);
 binData1 = varfun(@max,data1,'GroupingVariable','tbin1','InputVariable','PPall1');
@@ -92,9 +79,6 @@ binData1.Properties.VariableNames{'GroupCount'} = 'Count'; % #clicks per bin
 binData1.Properties.VariableNames{'max_PPall1'} = 'maxPP1';
 positiveCounts1 = sum(binData1.Count);
 positiveBins1 = length(binData1.Count);
-
-
-
 %% group data by 5min bins, days, weeks
 
 %group data by day for site 1
@@ -111,8 +95,6 @@ weekData1.year = year(weekData1.tbin1);
 weekTable1 = timetable2table(weekData1); 
 weekTable1.tbin1 = [];
 weekTable1(~weekTable1.Count_Bin1,:) = [];
-
-
 %%
 % Plotting
 

@@ -4,7 +4,8 @@ T = readtable('obis_seamap_dataset_280_points_csv.csv'); %Dataset 1 (Canadian Wi
 
 T2 = readtable('obis_seamap_dataset_1726_points_csv.csv'); %Dataset 2 (Happy Whale)
 
-%T3 = readtable(''); %Dataset 3
+T3 = readtable('ExtractedVisuals_edited.csv'); %Extracted Visuals (data picking)
+T3.Var1 = -(T3.Var1);
 
 table = T(200604:200631,:); %Dataset 1 (Sperm Whales only for Canadian Wildlife service dataset (1))
 
@@ -15,8 +16,11 @@ LongCanada = table.longitude; %Canadian
 LatHappy = T2.latitude; %Happy Whale dataset
 LongHappy = T2.longitude; %Happy Whale
 
-LatHARP = 72.72
-LongHARP = -76.23
+LatExt = T3.Var2;
+LongExt = T3.Var1;
+
+LatHARP = 72.72;
+LongHARP = -76.23;
 %%
 %Plotting
 %Canadian Wildlife service dataset
@@ -36,7 +40,8 @@ geobasemap landcover
 hold on
 geoscatter(LatHARP,LongHARP,markSize2,'.','MarkerEdgeColor',A);
 geobasemap landcover
-legend('Canada Dataset','Happy Whale','HARP')
+geoscatter(LatExt,LongExt,markSize,'.')
+legend('Canada Dataset','Happy Whale','HARP','Extracted Data')
 hold off
 
 

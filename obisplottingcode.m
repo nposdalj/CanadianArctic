@@ -16,8 +16,16 @@ LongCanada = table.longitude; %Canadian
 LatHappy = T2.latitude; %Happy Whale dataset
 LongHappy = T2.longitude; %Happy Whale
 
-LatExt = T3.Var2;
-LongExt = T3.Var1;
+%Split table 3 by author
+ind1 = T3(:,3) == 'Davidson';
+
+if strcmp(T3.Var3, 'Davidson');
+    LatDav = T3.Var2
+    LatDav = T3.Var1;
+else
+LatFro = T3.Var2;
+LongFro = T3.Var1;
+end
 
 LatHARP = 72.72;
 LongHARP = -76.23;

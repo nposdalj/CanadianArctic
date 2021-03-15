@@ -11,21 +11,21 @@ close all
 
 %% Parameters defined by user
 filePrefix = 'CANARC_PI'; % File name to match 
-siteabrev = 'CA'; %abbreviation of site.
+siteabrev = 'CANARC'; %abbreviation of site.
 sp = 'Pm'; % your species code
 itnum = '2'; % which iteration you are looking for
 srate = 200; % sample rate
 tpwsPath = 'E:\Project_Sites\CANARC\TPWS_120to125'; %directory of TPWS files
 effortXls = 'E:\Project_Sites\CANARC\Pm_Effort.xlsx'; % specify excel file with effort times
-saveDir = 'E:\Seasonality\CANARC'; %specify directory to save files
-load([saveDir,'\',siteabrev,'_workspace130.mat']); %load workspace from sumPPICIbin_seasonality code
+saveDir = 'E:\Project_Sites\CANARC'; %specify directory to save files
+load([saveDir,'\',siteabrev,'_workspace125.mat']); %load workspace from sumPPICIbin_seasonality code
 %% group data by 5min bins, days, weeks, and seasons
 %group data by 5 minute bins
 binDataIDX = (binData.Count < 5); %remove anything with less than 5 clicks in a bin
 binData.Count(binDataIDX) = 0;
 binTable = synchronize(binData,binEffort);
-binTable.Properties.VariableNames{'effortBin'} = 'Effort_Bin';
-binTable.Properties.VariableNames{'effortSec'} = 'Effort_Sec';
+binTable.Properties.VariableNames{'bin'} = 'Effort_Bin';
+binTable.Properties.VariableNames{'sec'} = 'Effort_Sec';
 binTable.maxPP = [];
 %binidx1 = (binTable.Count < 5);
 %binTable.Count(binidx1) = 0;
@@ -48,8 +48,8 @@ dayData = synchronize(Click,Bin);
 dayEffort = retime(binEffort,'daily','sum');
 dayTab = synchronize(dayData,dayEffort);
 dayTable = synchronize(dayData,dayEffort);
-dayTable.Properties.VariableNames{'effortBin'} = 'Effort_Bin';
-dayTable.Properties.VariableNames{'effortSec'} = 'Effort_Sec';
+dayTable.Properties.VariableNames{'bin'} = 'Effort_Bin';
+dayTable.Properties.VariableNames{'sec'} = 'Effort_Sec';
 dayTableZeros = dayTable;
 [y,~]=size(dayTable);
 dayTable.PreAbs = zeros(y,1);
@@ -504,8 +504,6 @@ end
 
 binEffort.Year = year(binEffort.tbin); 
 binEffort16 = binEffort(find(binEffort.Year == 2016,1,'first'):find(binEffort.Year == 2016,1,'last'),:);
-binEffort16.effortBin = [];
-binEffort16.effortSec = [];
 
 All_2016_Bins = synchronize(binEffort16,All_2016_Clicks,'regular','sum','TimeStep',minutes(5));
 
@@ -620,8 +618,6 @@ end
 
 binEffort.Year = year(binEffort.tbin); 
 binEffort189 = binEffort(find(binEffort.Year == 2018,1,'first'):find(binEffort.Year == 2019,1,'last'),:);
-binEffort189.effortBin = [];
-binEffort189.effortSec = [];
 
 All_20189_Bins = synchronize(binEffort189,All_20189_Clicks,'regular','sum','TimeStep',minutes(5));
 
@@ -698,28 +694,4 @@ ylabel('Count')
 Mean_20189 = nanmean(All_20189_Days.DutyPercent);
 Avg20189_DutyCycle = ['The average duty cycle for 2018/2019 was ',num2str(Mean_20189)];
 disp(Avg20189_DutyCycle)
-
-%% Code I didn't use
-%%Equation from Stanistreet et al. 2016
-% %duty cycle information
-% DutyCycle = 0.43; %duty cycle = 43%
-% CyclePeriod = 35; %cycle period of duty cycle in mins
-% LisPhase = 15; %minutes of listening
-% 
-% %solving for n - all days w/detections
-% unique_years = unique(dayTable.Year);
-% n = {};
-% for i = 1:length(unique_years)
-%     n{i} = sum(dayTable.PreAbs(dayTable.Year == unique_years(i)));
-% end
-% 
-% ListeningPhase1  =  [0:5:10]';
-% ListeningPhase2 = [15:5:25]';
-% ListeningPhase3 = [30:5:40]';
-% ListeningPhase4 = [45:5:55]';
-% pp = [ListeningPhase1 ListeningPhase2 ListeningPhase3 ListeningPhase4]; %all listening phase positions
-% 
-% Days_pp = 1/n{1}*pp
-% 
-% sum(binTable.PreAbs(binTable.Year == 2016));
 

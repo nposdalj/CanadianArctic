@@ -9,11 +9,11 @@ itnum = '2'; % which iteration you are looking for
 srate = 200; % sample rate
 tpwsPath = 'E:\Project_Sites\CANARC\TPWS_120to125'; %directory of TPWS files
 effortXls = 'E:\Project_Sites\CANARC\Pm_Effort.xlsx'; % specify excel file with effort times
-saveDir = 'E:\Project_Sites\CANARC'; %specify directory to save files
-manualDir = 'E:\Project_Sites\CANARC\guysbight_log2.xls'; %location of manual logging for Guys Bight
-manualEffort = 'E:\Project_Sites\CANARC\GuysBight_Effort.xlsx'; %location of Guys Bight effort
+saveDir = 'E:\Project_Sites\CANARC\Plots'; %specify directory to save files
+manualDir = 'E:\Project_Sites\CANARC\Manual Logging\guysbight_log2.xls'; %location of manual logging for Guys Bight
+manualEffort = 'E:\Project_Sites\CANARC\Manual Logging\GuysBight_Effort.xlsx'; %location of Guys Bight effort
 PlotSiteName = 'Pond Inlet in the Canadian Arctic';
-IceData = 'C:\Users\nposd\Documents\GitHub\CanadianArctic\SeaIceData_BaffinBay.csv'
+IceData = 'C:\Users\nposd\Documents\GitHub\CanadianArctic\SeaIceData_BaffinBay.csv';
 %% define subfolder that fit specified iteration
 if itnum > 1
    for id = 2: str2num(itnum) % iterate id times according to itnum
@@ -68,14 +68,14 @@ concatFiles = fileList(fileMatchIdx);
 p = sp_setting_defaults('sp',sp,'analysis','SumPPICIBin');
 %% Concatenate variables
 PPall = []; TTall = []; ICIall = []; % initialize matrices
-parfor idsk = 1 : length(concatFiles)
+for idsk = 1 : length(concatFiles)
     % Load file
     fprintf('Loading %d/%d file %s\n',idsk,length(concatFiles),fullfile(tpwsPath,concatFiles{idsk}))
     D = load(fullfile(tpwsPath,concatFiles{idsk}));
     
     % find times outside effort (sometimes there are detections
     % which are from the audio test at the beggining of the wav file)
-    within = cell2mat(arrayfun(@(x)sum(isbetween(x,datenum(effort.Start),datenum(effort.End))),D.MTT,'uni',false)); %#ok<PFBNS>
+    within = cell2mat(arrayfun(@(x)sum(isbetween(x,datetime(effort.Start),datetime(effort.End))),datetime(D.MTT,'ConvertFrom','datenum'),'uni',false));
     goodIdx = find(within ~= 0);
     MTT = D.MTT(goodIdx); % only keep the good detections
     MPP = D.MPP(goodIdx);
@@ -153,11 +153,9 @@ Bin = retime(binData(:,1),'daily','count'); % #bin per day
 %group data by day
 dayData = synchronize(Click,Bin);
 dayEffort = retime(binEffort,'daily','sum');
-dayTab = synchronize(dayData,dayEffort);
 dayTable = synchronize(dayData,dayEffort);
 dayTable.Properties.VariableNames{'bin'} = 'Effort_Bin';
 dayTable.Properties.VariableNames{'sec'} = 'Effort_Sec';
-dayTableZeros = dayTable;
 dayTable(~dayTable.Effort_Bin,:)=[]; %removes days with no effort, NOT days with no presence
 %% statistical methods from Diogou, et al. 2019 - by daily 5 min bins ** USE THIS **
 [pp,~]=size(dayTable);
@@ -208,6 +206,12 @@ dayTable.Season(springidxD) = 4;
 %add year and day to data
 dayTable.Year = year(dayTable.tbin); 
 dayTable.day = day(dayTable.tbin,'dayofyear');
+
+% Accounting for the duty cycle one last way
+dayTable.DutyBin = dayTable.Count_Bin;
+dayTable.DutyBin(435:603) = dayTable.DutyBin(435:603)/0.4436; %this value came from the code 'Evaluating Duty Cycle'
+dayTable.DutyClick = dayTable.Count_Click;
+dayTable.DutyClick(435:603) = dayTable.DutyClick(435:603)/0.4436; %this value came from the code 'Evaluting Duty Cycle'
 
 NANidx = ismissing(dayTable(:,{'NormBin'}));
 dayTable{:,{'NormBin'}}(NANidx) = 0; %if there was effort, but no detections change the NormBin column to zero
@@ -265,8 +269,9 @@ manDet.HoursProp = manDet.Hours./(manDet.Effort_Sec ./ (60 * 60)); %proportion o
 manDet.month = month(manDet.tbin);
 manDet.Year = year(manDet.tbin);
 manDet.day = day(manDet.tbin,'dayofyear');
+manDet.DutyBin = manDet.Count_Bin;
 
-columns2delete = [1 5 6 10 11 12 13 14];
+columns2delete = [1 5 6 10 11 12 13 14 19];
 dayTable(:,columns2delete) = [];
 dayTable2 = [manDet; dayTable];
 
@@ -279,7 +284,10 @@ monthTable = retime(dayTable2,'monthly','mean');
 monthTable2 = retime(dayTable2,'monthly','sum');
 monthTable.Year = year(monthTable.tbin);
 monthTable.month = month(monthTable.tbin);
-%% Daily Table
+monthTable2.Year = year(monthTable2.tbin);
+monthTable2.month = month(monthTable2.tbin);
+%% Proportion of Hours Plots
+%Daily Table
 dayTable2.Percent = dayTable2.Effort_Sec./86400;
 figure
 yyaxis left
@@ -293,7 +301,7 @@ ylim([-0.01 1.01])
 col = [0 0 0];
 set(gcf,'defaultAxesColorOrder',[col;col])
 %% Weekly Table
-weekTable.Percent = weekTable2.Effort_Sec./604800
+weekTable.Percent = weekTable2.Effort_Sec./604800;
 figure
 yyaxis left
 bar(weekTable.tbin,weekTable.HoursProp,'k')
@@ -310,6 +318,14 @@ Ice = readtable(IceData);
 Ice.Year = floor(Ice.Date/100);
 Ice.month = floor(Ice.Date-Ice.Year*100);
 monthTable_Ice = join(monthTable, Ice);
+
+%Interpolating Ice data month --> day
+time = (dayTable2.tbin(1):dayTable2.tbin(end))';
+IceD = interp1(monthTable.tbin,monthTable_Ice.Value,dayTable2.tbin); %interpolate ice data to daily
+dayTable2.Ice = IceD;
+
+IceW = interp1(monthTable.tbin,monthTable_Ice.Value,weekTable.tbin);
+weekTable.Ice = IceW;
 %% Monthly Plot - 2 axis
 monthTable.Percent = monthTable2.Effort_Sec./2628288;
 monthTable.Percent(isnan(monthTable.Percent))=0;
@@ -379,7 +395,7 @@ subplot(2,1,2);
 yyaxis left
 bar(weekTable.tbin,weekTable.Count_Bin,'k')
 hold on
-bar(manDet2.StartTime,manDet2.Count_Bin,'k')
+bar(manDet.tbin,manDet.Count_Bin,'k')
 x1 = datetime(2015,07,01);
 xlim([x1 weekTable.tbin(end)])
 ylabel({'Weekly Mean'; 'of 5-min bins per day'});
@@ -413,3 +429,73 @@ hold off
 % Save plot
 weeklyfn = [filePrefix,'_',p.speName,'_weeklypresence_withPercentEffort'];
 saveas(gcf,fullfile(saveDir,weeklyfn),'png')
+%% With the Duty Cycle supplement
+%Daily Table
+dayTable2.Percent = dayTable2.Effort_Sec./86400;
+figure
+yyaxis left
+bar(dayTable2.tbin,dayTable2.DutyBin,'k')
+title('Proportion of Hours Per Day with Sperm Whales at Pond Inlet in the Canadian Arctic')
+ylabel('Propertion of Hours/Day')
+yyaxis right
+plot(dayTable2.tbin, dayTable2.Percent, '.r')
+ylabel('Percent Effort')
+ylim([-0.01 1.01])
+col = [0 0 0];
+set(gcf,'defaultAxesColorOrder',[col;col])
+%% Weekly Table
+weekTable.Percent = weekTable2.Effort_Sec./604800;
+figure
+yyaxis left
+bar(weekTable.tbin,weekTable.DutyBin,'k')
+title('Average Proportion of Hours Per Week with Sperm Whales at Pond Inlet in the Canadian Arctic')
+ylabel('Proportion of Hours/Week')
+yyaxis right
+plot(weekTable.tbin,weekTable.Percent,'.r')
+ylabel('Percent Effort')
+ylim([-0.01 1.01])
+col = [0 0 0];
+set(gcf,'defaultAxesColorOrder',[col;col])
+
+%% Weekly Table - 2 axis (w/Ice)
+figure
+% yyaxis left
+bar(weekTable.tbin,weekTable.DutyBin,'k')
+addaxis(weekTable.tbin,weekTable.Ice,[0 1.2])
+addaxis(weekTable.tbin,weekTable.Percent,[-0.01 1.01],'.r');
+addaxislabel(1,'Average # of 5-Minute Bins/Week')
+addaxislabel(2,'Sea Ice Extent (million square km)')
+addaxislabel(3,'Percent Effort')
+xlim([min(weekTable.tbin) max(weekTable.tbin)])
+title({'Average Weekly Presence with Sperm Whales','at Pond Inlet in the Canadian Arctic'})
+col = [0 0 0];
+set(gcf,'defaultAxesColorOrder',[col;col])
+weekly_Ice = [filePrefix,'_',p.speName,'weeklyPresence_SeaIce'];
+saveas(gcf,fullfile(saveDir,weekly_Ice),'png')
+%% Monthly Plot - 2 axis
+monthTable2.Percent = monthTable2.Effort_Sec./2628288;
+monthTable2.Percent(isnan(monthTable2.Percent))=0;
+monthTable2.EffortPlot = 1-monthTable2.Percent;
+maxx = max(monthTable_Ice.Value);
+Index_effort = monthTable2.Percent >= 1;
+monthTable2.Percent(Index_effort) = 1;
+% figure(5); set(5,'name','Monthly presence','DefaultAxesColor',[.8 .8 .8]) 
+% set(gca,'defaultAxesColorOrder',[0 0 0; 0 0 0]);
+figure
+% yyaxis left
+bar(monthTable2.tbin,monthTable2.DutyBin,'k')
+addaxis(monthTable_Ice.tbin,monthTable_Ice.Value,[0 1.2])
+addaxis(monthTable2.tbin,monthTable2.Percent,[-0.01 1.01],'.r');
+addaxislabel(1,'Average Proportion of Hours/Week')
+addaxislabel(2,'Sea Ice Extent (million square km)')
+addaxislabel(3,'Percent Effort')
+xlim([min(monthTable2.tbin) max(monthTable2.tbin)])
+title({'Average Proportion of Hours Per Month with Sperm Whales','at Pond Inlet in the Canadian Arctic'})
+col = [0 0 0];
+set(gcf,'defaultAxesColorOrder',[col;col])
+monthly_Ice = [filePrefix,'_',p.speName,'monthlyPresence_seaIceExtent'];
+saveas(gcf,fullfile(saveDir,monthly_Ice),'png')
+
+%% save certain variables
+writetable(timetable2table(weekTable),[saveDir,'/WeeklyIceTable.xlsx']); %weekly sea ice
+writetable(timetable2table(dayTable2),[saveDir,'/DailyIceTable.xlsx']); %daily sea ice

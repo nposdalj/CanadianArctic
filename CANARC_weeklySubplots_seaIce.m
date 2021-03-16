@@ -15,12 +15,13 @@ clear all
 %% Specity directories
 SaveDir = 'E:\Project_Sites\CANARC\Plots'; %where the xlsx documents are saved
 filePrefix = 'CANARC_PI'; %site name for plots
-
 %% load necessary files
-DayTable = readtable('E:\Project_Sites\CANARC\Plots\DailyIceTable.xlsx');
+DayTable = table2timetable(readtable('E:\Project_Sites\CANARC\Plots\DailyIceTable.xlsx'));
 DayTable.Day = day(DayTable.tbin,'dayofyear');
-WeekTable = readtable('E:\Project_Sites\CANARC\Plots\WeeklyIceTable.xlsx');
+DayTable.Year = year(DayTable.tbin);
+WeekTable = table2timetable(readtable('E:\Project_Sites\CANARC\Plots\WeeklyIceTable.xlsx'));
 WeekTable.Week = week(WeekTable.tbin);
+WeekTable.Year = year(WeekTable.tbin);
 %%
 % Plotting
 
@@ -29,28 +30,28 @@ figure
 subplot(5,1,1)
 bar1 = bar(WeekTable.Week(WeekTable.Year==2015),WeekTable.DutyBin(WeekTable.Year==2015),'k'); %year 2015
 title('2015')
-xlim([30 40])
+xlim([30 42])
 ylim([0 max(WeekTable.DutyBin(WeekTable.Year==2015))])
 subplot(5,1,2)
 bar2 = bar(WeekTable.Week(WeekTable.Year==2016),WeekTable.DutyBin(WeekTable.Year==2016),'k'); %year 2016
 title('2016')
-xlim([30 40])
+xlim([30 42])
 ylim([0 max(WeekTable.DutyBin(WeekTable.Year==2016))])
 subplot(5,1,3)
 bar3 = bar(WeekTable.Week(WeekTable.Year==2017),WeekTable.DutyBin(WeekTable.Year==2017),'k'); %year 2017
 title('2017')
-xlim([30 40])
+xlim([30 42])
 ylim([0 max(WeekTable.DutyBin(WeekTable.Year==2017))])
 ylabel('Average Weekly Bin Counts)')
 subplot(5,1,4)
 bar4 = bar(WeekTable.Week(WeekTable.Year==2018),WeekTable.DutyBin(WeekTable.Year==2018),'k');  %year 2018
 title('2018')
-xlim([30 40])
+xlim([30 42])
 ylim([0 max(WeekTable.DutyBin(WeekTable.Year==2018))])
 subplot(5,1,5)
 bar5 = bar(WeekTable.Week(WeekTable.Year==2019),WeekTable.DutyBin(WeekTable.Year==2019),'k');  %year 2019
 title('2019')
-xlim([30 40])
+xlim([30 42])
 ylim([0 max(WeekTable.DutyBin(WeekTable.Year==2019))])
 xlabel('Week #')
 sgtitle('Average Weekly Bin Counts in Pond Inlet 2015-2019')
@@ -98,15 +99,84 @@ dailyfn = [filePrefix,'_averageDailyBin_Subplots'];
 saveas(gcf,fullfile(SaveDir,dailyfn),'png')
 
 %% Adding SeaIce to plots
+%daily
 figure
 subplot(5,1,1)
 bar(DayTable.Day(DayTable.Year==2015),DayTable.DutyBin(DayTable.Year==2015),'k'); %year 2015
-addaxis(DayTable.Day(DayTable.Year==2015),DayTable.Ice(DayTable.Year==2015));
+addaxis(DayTable.Day(DayTable.Year==2015),DayTable.Ice(DayTable.Year==2015),[0 0.5]);
 addaxis(DayTable.Day(DayTable.Year==2015),DayTable.Percent(DayTable.Year==2015),[-0.01 1.01],'.r');
+title('2015')
+xlim([182 300])
+subplot(5,1,2)
+bar(DayTable.Day(DayTable.Year==2016),DayTable.DutyBin(DayTable.Year==2016),'k'); %year 2016
+addaxis(DayTable.Day(DayTable.Year==2016),DayTable.Ice(DayTable.Year==2016),[0 0.5]);
+addaxis(DayTable.Day(DayTable.Year==2016),DayTable.Percent(DayTable.Year==2016),[-0.01 1.01],'.r');
+xlim([182 300])
+title('2016')
+subplot(5,1,3)
+bar(DayTable.Day(DayTable.Year==2017),DayTable.DutyBin(DayTable.Year==2017),'k'); %year 2017
+addaxis(DayTable.Day(DayTable.Year==2017),DayTable.Ice(DayTable.Year==2017),[0 0.5]);
+addaxis(DayTable.Day(DayTable.Year==2017),DayTable.Percent(DayTable.Year==2017),[-0.01 1.01],'.r');
 addaxislabel(1,'5-Minute Bins/Day')
 addaxislabel(2,'Sea Ice Extent (million square km)')
 addaxislabel(3,'Percent Effort')
+title('2017')
+xlim([182 300])
+subplot(5,1,4)
+bar(DayTable.Day(DayTable.Year==2018),DayTable.DutyBin(DayTable.Year==2018),'k');  %year 2018
+addaxis(DayTable.Day(DayTable.Year==2018),DayTable.Ice(DayTable.Year==2018),[0 0.5]);
+addaxis(DayTable.Day(DayTable.Year==2018),DayTable.Percent(DayTable.Year==2018),[-0.01 1.01],'.r');
+title('2018')
+xlim([182 300])
+subplot(5,1,5)
+bar(DayTable.Day(DayTable.Year==2019),DayTable.DutyBin(DayTable.Year==2019),'k');  %year 2019
+addaxis(DayTable.Day(DayTable.Year==2019),DayTable.Ice(DayTable.Year==2019),[0 0.5]);
+addaxis(DayTable.Day(DayTable.Year==2019),DayTable.Percent(DayTable.Year==2019),[-0.01 1.01],'.r');
+title('2019')
+xlim([182 300])
+xlabel('Day of Year')
+sgtitle('Daily Bin Countss in Pond Inlet 2015-2019 with Sea Ice Concentration')
+% Save plot
+dailyfn = [filePrefix,'_DailySeaIce_Subplots'];
+saveas(gcf,fullfile(SaveDir,dailyfn),'png')
+
+%weekly
+figure
+subplot(5,1,1)
+bar(WeekTable.Week(WeekTable.Year==2015),WeekTable.DutyBin(WeekTable.Year==2015),'k'); %year 2015
+addaxis(WeekTable.Week(WeekTable.Year==2015),WeekTable.Ice(WeekTable.Year==2015),[0 0.5]);
+addaxis(WeekTable.Week(WeekTable.Year==2015),WeekTable.Percent(WeekTable.Year==2015),[-0.01 1.01],'.r');
 title('2015')
-% xlim([min(DayTable.Day(DayTable.Year == 2015)) max(DayTable.Day(DayTable.Year == 2015))])
-xlim([192 300])
-ylim([0 max(DayTable.DutyBin(DayTable.Year==2015))])
+xlim([28 44])
+subplot(5,1,2)
+bar(WeekTable.Week(WeekTable.Year==2016),WeekTable.DutyBin(WeekTable.Year==2016),'k'); %year 2016
+addaxis(WeekTable.Week(WeekTable.Year==2016),WeekTable.Ice(WeekTable.Year==2016),[0 0.5]);
+addaxis(WeekTable.Week(WeekTable.Year==2016),WeekTable.Percent(WeekTable.Year==2016),[-0.01 1.01],'.r');
+xlim([28 44])
+title('2016')
+subplot(5,1,3)
+bar(WeekTable.Week(WeekTable.Year==2017),WeekTable.DutyBin(WeekTable.Year==2017),'k'); %year 2017
+addaxis(WeekTable.Week(WeekTable.Year==2017),WeekTable.Ice(WeekTable.Year==2017),[0 0.5]);
+addaxis(WeekTable.Week(WeekTable.Year==2017),WeekTable.Percent(WeekTable.Year==2017),[-0.01 1.01],'.r');
+addaxislabel(1,'Average 5-Minute Bins/Week')
+addaxislabel(2,'Sea Ice Extent (million square km)')
+addaxislabel(3,'Percent Effort')
+title('2017')
+xlim([28 44])
+subplot(5,1,4)
+bar(WeekTable.Week(WeekTable.Year==2018),WeekTable.DutyBin(WeekTable.Year==2018),'k');  %year 2018
+addaxis(WeekTable.Week(WeekTable.Year==2018),WeekTable.Ice(WeekTable.Year==2018),[0 0.5]);
+addaxis(WeekTable.Week(WeekTable.Year==2018),WeekTable.Percent(WeekTable.Year==2018),[-0.01 1.01],'.r');
+title('2018')
+xlim([27 44])
+subplot(5,1,5)
+bar(WeekTable.Week(WeekTable.Year==2019),WeekTable.DutyBin(WeekTable.Year==2019),'k');  %year 2019
+addaxis(WeekTable.Week(WeekTable.Year==2019),WeekTable.Ice(WeekTable.Year==2019),[0 0.5]);
+addaxis(WeekTable.Week(WeekTable.Year==2019),WeekTable.Percent(WeekTable.Year==2019),[-0.01 1.01],'.r');
+title('2019')
+xlim([28 44])
+xlabel('Day of Year')
+sgtitle('Average Weekly Bin Countss in Pond Inlet 2015-2019 with Sea Ice Concentration')
+% Save plot
+weeklyfn = [filePrefix,'_WeeklySeaIce_Subplots'];
+saveas(gcf,fullfile(SaveDir,weeklyfn),'png')

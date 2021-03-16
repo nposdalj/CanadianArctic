@@ -275,6 +275,11 @@ columns2delete = [1 5 6 10 11 12 13 14 19];
 dayTable(:,columns2delete) = [];
 dayTable2 = [manDet; dayTable];
 
+%adding october 27th 2019 before retiming
+Oct27 = table2timetable(readtable('E:\Project_Sites\CANARC\Plots\Oct27.xlsx'));
+dayTable2 = [dayTable2; Oct27];
+dayTable2 = retime(dayTable2,'daily','fillwithmissing');
+
 %summarize data weekly
 weekTable = retime(dayTable2,'weekly','mean');
 weekTable2 = retime(dayTable2,'weekly','sum');
@@ -289,6 +294,7 @@ monthTable2.month = month(monthTable2.tbin);
 %% Proportion of Hours Plots
 %Daily Table
 dayTable2.Percent = dayTable2.Effort_Sec./86400;
+dayTable2.Percent(isnan(dayTable2.Percent)) = 0;
 figure
 yyaxis left
 bar(dayTable2.tbin,dayTable2.HoursProp,'k')
@@ -432,6 +438,7 @@ saveas(gcf,fullfile(saveDir,weeklyfn),'png')
 %% With the Duty Cycle supplement
 %Daily Table
 dayTable2.Percent = dayTable2.Effort_Sec./86400;
+dayTable2.Percent(isnan(dayTable2.Percent)) = 0;
 figure
 yyaxis left
 bar(dayTable2.tbin,dayTable2.DutyBin,'k')

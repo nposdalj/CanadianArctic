@@ -16,16 +16,11 @@ LongCanada = table.longitude; %Canadian
 LatHappy = T2.latitude; %Happy Whale dataset
 LongHappy = T2.longitude; %Happy Whale
 
-%Split table 3 by author
-ind1 = T3(:,3) == 'Davidson';
+LatDav = T3.Var2(string(T3.Var3) == 'Davidson');
+LongDav = T3.Var1(string(T3.Var3) == 'Davidson');
 
-if strcmp(T3.Var3, 'Davidson');
-    LatDav = T3.Var2
-    LatDav = T3.Var1;
-else
-LatFro = T3.Var2;
-LongFro = T3.Var1;
-end
+LatFou = T3.Var2(string(T3.Var3) == 'Fouin-Mouy');
+LongFou = T3.Var1(string(T3.Var3) == 'Fouin-Mouy');
 
 LatHARP = 72.72;
 LongHARP = -76.23;
@@ -33,6 +28,8 @@ LongHARP = -76.23;
 %Plotting
 %Canadian Wildlife service dataset
 %below is the color of your markers, edit if needed
+E = [0.75, 0.75, 0];
+D = [0 1 0];
 C = [1 0 0];
 B = [0.5 0 0];
 A = [0 0 0.25];
@@ -48,8 +45,13 @@ geobasemap landcover
 hold on
 geoscatter(LatHARP,LongHARP,markSize2,'.','MarkerEdgeColor',A);
 geobasemap landcover
-geoscatter(LatExt,LongExt,markSize,'.')
-legend('Canada Dataset','Happy Whale','HARP','Extracted Data')
+hold on
+geoscatter(LatDav,LongDav,markSize,'.','MarkerEdgeColor',D);
+geobasemap landcover
+hold on
+geoscatter(LatFou,LongFou,markSize,'.','MarkerEdgeColor',E);
+geobasemap landcover
+legend('Canada Dataset','Happy Whale','HARP','Davidson','Fouin-Mouy')
 hold off
 
 

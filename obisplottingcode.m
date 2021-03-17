@@ -4,7 +4,7 @@ T = readtable('obis_seamap_dataset_280_points_csv.csv'); %Dataset 1 (Canadian Wi
 
 T2 = readtable('obis_seamap_dataset_1726_points_csv.csv'); %Dataset 2 (Happy Whale)
 
-T3 = readtable('ExtractedVisuals_edited.csv'); %Extracted Visuals (data picking)
+T3 = readtable('ExtractedVisuals_Flipped.csv'); %Extracted Visuals (data picking)
 T3.Var1 = -(T3.Var1);
 
 table = T(200604:200631,:); %Dataset 1 (Sperm Whales only for Canadian Wildlife service dataset (1))
@@ -19,8 +19,8 @@ LongHappy = T2.longitude; %Happy Whale
 LatDav = T3.Var2(string(T3.Var3) == 'Davidson');
 LongDav = T3.Var1(string(T3.Var3) == 'Davidson');
 
-LatFou = T3.Var2(string(T3.Var3) == 'Fouin-Mouy');
-LongFou = T3.Var1(string(T3.Var3) == 'Fouin-Mouy');
+LatFou = T3.Var2(string(T3.Var3) == 'Frouin-Mouy');
+LongFou = T3.Var1(string(T3.Var3) == 'Frouin-Mouy');
 
 LatHARP = 72.72;
 LongHARP = -76.23;
@@ -34,7 +34,7 @@ C = [1 0 0];
 B = [0.5 0 0];
 A = [0 0 0.25];
 %size of markers 
-markSize = 80;
+markSize = 120;
 markSize2 = 170;
 figure
 geoscatter(LatCanada,LongCanada,markSize,'.','MarkerEdgeColor',C);

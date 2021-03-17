@@ -101,6 +101,7 @@ saveas(gcf,fullfile(SaveDir,dailyfn),'png')
 %% Adding SeaIce to plots
 %daily
 figure
+%sgtitle({'Daily Bin Counts in Pond Inlet', '2015-2019 with Sea Ice Concentration'})
 subplot(5,1,1)
 bar(DayTable.Day(DayTable.Year==2015),DayTable.DutyBin(DayTable.Year==2015),'k'); %year 2015
 addaxis(DayTable.Day(DayTable.Year==2015),DayTable.Ice(DayTable.Year==2015),[0 0.5]);
@@ -135,7 +136,6 @@ addaxis(DayTable.Day(DayTable.Year==2019),DayTable.Percent(DayTable.Year==2019),
 title('2019')
 xlim([182 300])
 xlabel('Day of Year')
-sgtitle('Daily Bin Counts in Pond Inlet 2015-2019 with Sea Ice Concentration')
 % Save plot
 dailyfn = [filePrefix,'_DailySeaIce_Subplots'];
 saveas(gcf,fullfile(SaveDir,dailyfn),'png')
@@ -176,7 +176,7 @@ addaxis(WeekTable.Week(WeekTable.Year==2019),WeekTable.Percent(WeekTable.Year==2
 title('2019')
 xlim([28 44])
 xlabel('Day of Year')
-sgtitle('Average Weekly Bin Countss in Pond Inlet 2015-2019 with Sea Ice Concentration')
+%sgtitle('Average Weekly Bin Countss in Pond Inlet 2015-2019 with Sea Ice Concentration')
 % Save plot
 weeklyfn = [filePrefix,'_WeeklySeaIce_Subplots'];
 saveas(gcf,fullfile(SaveDir,weeklyfn),'png')

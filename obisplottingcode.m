@@ -22,6 +22,10 @@ LongDav = T3.Var1(string(T3.Var3) == 'Davidson');
 LatFou = T3.Var2(string(T3.Var3) == 'Frouin-Mouy');
 LongFou = T3.Var1(string(T3.Var3) == 'Frouin-Mouy');
 
+LatiNat = T3.Var2(string(T3.Var3) == 'iNaturalist');
+LongiNat = T3.Var1(string(T3.Var3) == 'iNaturalist');
+
+
 LatHARP = 72.72;
 LongHARP = -76.23;
 %%
@@ -29,29 +33,35 @@ LongHARP = -76.23;
 %Canadian Wildlife service dataset
 %below is the color of your markers, edit if needed
 E = [0.75, 0.75, 0];
-D = [0 1 0];
-C = [1 0 0];
+D = [0 0.5 0];
+C = [1 0.5 0];
 B = [0.5 0 0];
 A = [0 0 0.25];
 %size of markers 
-markSize = 120;
+markSize = 220;
 markSize2 = 170;
 figure
-geoscatter(LatCanada,LongCanada,markSize,'.','MarkerEdgeColor',C);
-geobasemap landcover
-hold on
-geoscatter(LatHappy,LongHappy,markSize,'.','MarkerEdgeColor',B);
-geobasemap landcover
-hold on
-geoscatter(LatHARP,LongHARP,markSize2,'.','MarkerEdgeColor',A);
-geobasemap landcover
-hold on
+% geoscatter(LatCanada,LongCanada,markSize,'.','MarkerEdgeColor',C);
+% geobasemap landcover
+% hold on
 geoscatter(LatDav,LongDav,markSize,'.','MarkerEdgeColor',D);
 geobasemap landcover
 hold on
 geoscatter(LatFou,LongFou,markSize,'.','MarkerEdgeColor',E);
 geobasemap landcover
-legend('Canada Dataset','Happy Whale','HARP','Davidson','Fouin-Mouy')
+hold on
+geoscatter(LatHappy,LongHappy,markSize,'.','MarkerEdgeColor',B);
+geobasemap landcover
+hold on
+geoscatter(LatiNat,LongiNat,markSize2,'.','MarkerEdgeColor',C);
+geobasemap landcover
+hold on
+geoscatter(LatHARP,LongHARP,markSize2,'.','MarkerEdgeColor',A);
+geobasemap landcover
+hold on
+[~,objh] = legend('Davidson','Frouin-Mouy','Happy Whale','iNaturalist')
+objh1 = findobj(objh,'type','patch');
+set(objh1,'MarkerSize',30);
 hold off
 
 

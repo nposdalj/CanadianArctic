@@ -135,7 +135,7 @@ addaxis(DayTable.Day(DayTable.Year==2019),DayTable.Percent(DayTable.Year==2019),
 title('2019')
 xlim([182 300])
 xlabel('Day of Year')
-sgtitle('Daily Bin Countss in Pond Inlet 2015-2019 with Sea Ice Concentration')
+sgtitle('Daily Bin Counts in Pond Inlet 2015-2019 with Sea Ice Concentration')
 % Save plot
 dailyfn = [filePrefix,'_DailySeaIce_Subplots'];
 saveas(gcf,fullfile(SaveDir,dailyfn),'png')

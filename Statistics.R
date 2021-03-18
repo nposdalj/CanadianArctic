@@ -38,6 +38,10 @@ ggplot(DayIce, aes(x=YearF, y=DutyBin))+
   ggtitle(title2)+
   labs(y="Average # of 5 min bins per day")
 
+#Grouping Data by ITS
+n = 4
+Grouped = aggregate(DayIce,list(rep(1:(nrow(DayIce)%/%n+1),each=n,len=nrow(DayIce))),mean)[-1];
+
 #GAM to identify seasonal pattern
 gamTw = gam(DutyBin ~ s(day, bs = 'cc', k = 15)+s(Ice)+s(Year, k = 5), data = DayIce, family = tw, method = "REML")
 plot(gamTw, pages = 1)
@@ -71,8 +75,20 @@ print(vizGG2,pages =1)
 fig7 =paste("G:/.shortcut-targets-by-id/1lwxYjZ-5ScY65o65OfWCtYU-FpMLIpXS/Arctic_Sperm whales/figures/GAM2_Allyears.png",sep="")
 ggsave(fig7)
 
+#GAMs with ITS grouping
+gamTw = gam(DutyBin ~ s(day, bs = 'cc', k = 15)+s(Ice)+s(Year, k = 5), data = Grouped, family = tw, method = "REML")
+plot(gamTw, pages = 1)
+summary(gamTw)
+
+viz = getViz(gamTw)
+print(plot(viz,allTerms=T),pages=1)
+fig6 =paste("G:/.shortcut-targets-by-id/1lwxYjZ-5ScY65o65OfWCtYU-FpMLIpXS/Arctic_Sperm whales/figures/GAM_Grouped_Allyears.png",sep="")
+ggsave(fig6)
+
 #GAMs without 2015
 DayIceHARP = subset(DayIce, Year!="2015")
+n = 4
+GroupedHARP = aggregate(DayIceHARP,list(rep(1:(nrow(DayIceHARP)%/%n+1),each=n,len=nrow(DayIceHARP))),mean)[-1];
 
 #GAM to identify seasonal pattern
 gamTw = gam(DutyBin ~ s(day, bs = 'cc', k = 15)+s(Ice)+s(Year, k = 4), data = DayIceHARP, family = tw, method = "REML")
@@ -106,6 +122,16 @@ vizGG2 = plot(viz, allTerms = T) +
 print(vizGG2,pages =1)
 fig7 =paste("G:/.shortcut-targets-by-id/1lwxYjZ-5ScY65o65OfWCtYU-FpMLIpXS/Arctic_Sperm whales/figures/GAM2_HARPyears.png",sep="")
 ggsave(fig7)
+
+#GAMs with ITS grouping
+gamTw = gam(DutyBin ~ s(day, bs = 'cc', k = 15)+s(Ice)+s(Year, k = 5), data = GroupedHARP, family = tw, method = "REML")
+plot(gamTw, pages = 1)
+summary(gamTw)
+
+viz = getViz(gamTw)
+print(plot(viz,allTerms=T),pages=1)
+fig6 =paste("G:/.shortcut-targets-by-id/1lwxYjZ-5ScY65o65OfWCtYU-FpMLIpXS/Arctic_Sperm whales/figures/GAM_Grouped_HARPyears.png",sep="")
+ggsave(fig6)
 
 ## Generalized Additive Mixed Models
 #All years

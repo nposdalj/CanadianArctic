@@ -506,3 +506,15 @@ saveas(gcf,fullfile(saveDir,monthly_Ice),'png')
 %% save certain variables
 writetable(timetable2table(weekTable),[saveDir,'/WeeklyIceTable.xlsx']); %weekly sea ice
 writetable(timetable2table(dayTable2),[saveDir,'/DailyIceTable.xlsx']); %daily sea ice
+
+%% Testing for autocorrelation
+%All data
+dayTable2.DutyBin(isnan(dayTable2.DutyBin)) = 0; 
+ts = dayTable2.DutyBin;
+its_cont = IntegralTimeScaleCalc(ts);
+
+%Harp Data only
+dayTable2(1:184,:) = [];
+dayTable2.DutyBin(isnan(dayTable2.DutyBin)) = 0; 
+ts = dayTable2.DutyBin;
+its_cont = IntegralTimeScaleCalc(ts);

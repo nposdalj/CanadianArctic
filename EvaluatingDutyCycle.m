@@ -17,7 +17,7 @@ itnum = '2'; % which iteration you are looking for
 srate = 200; % sample rate
 tpwsPath = 'E:\Project_Sites\CANARC\TPWS_120to125'; %directory of TPWS files
 effortXls = 'E:\Project_Sites\CANARC\Pm_Effort.xlsx'; % specify excel file with effort times
-saveDir = 'E:\Project_Sites\CANARC'; %specify directory to save files
+saveDir = 'E:\Project_Sites\CANARC\Plots'; %specify directory to save files
 load([saveDir,'\',siteabrev,'_workspace125.mat']); %load workspace from sumPPICIbin_seasonality code
 %% group data by 5min bins, days, weeks, and seasons
 %group data by 5 minute bins
@@ -442,8 +442,8 @@ min(BinsMissed_1819.Inflation)
 nanmean(BinsMissed_1819.Inflation)
 nanmedian(BinsMissed_1819.Inflation)
 
-%% Evaluating the duty cycle by shifting the 15 minute listening period by 1 minute
-%within the entire 35 minute cycle. This will result in 35 samples.
+%% Evaluating the duty cycle by shifting the 15 minute listening period by 1 minute - THIS IS THE ONE I ENDED UP USING
+%within the entire 20 minute cycle. This will result in 20 samples.
 %group data by 1 minute bins
 tbin = datetime([vTT(:,1:4), floor(vTT(:,5)), ...
     zeros(length(vTT),1)]); %round to the nearest minute
@@ -479,10 +479,10 @@ clickTable2016.Year = [];
 clickTable2016 = table2timetable(clickTable2016);
 
 All_2016_Clicks = [];
-for j = 1:35
+for j = 1:20
     Sub_2016 = [];
-    for i = j:35:cT16-2
-        cycleRange = i:i+34;
+    for i = j:20:cT16-2
+        cycleRange = i:i+19;
         columnsToDelete = cycleRange > 312481;
         cycleRange(columnsToDelete) = [];
         dataRange = clickTable2016(cycleRange,:);
@@ -511,7 +511,7 @@ All_2016_Bins = synchronize(binEffort16,All_2016_Clicks,'regular','sum','TimeSte
 Count2016IDX = (All_2016_Bins.Count < 5);
 All_2016_Bins.Count(Count2016IDX) = 0;
 
-for i = 1:35
+for i = 1:20
     variableName = ['Count_Sub',num2str(i)];
     All2016IDX = (All_2016_Bins.(variableName) < 5); %remove anything with less than 5 clicks in a bin
     All_2016_Bins.(variableName)(All2016IDX) = 0;
@@ -593,10 +593,10 @@ clickTable20189.Year = [];
 clickTable20189 = table2timetable(clickTable20189);
 
 All_20189_Clicks = [];
-for j = 1:35
+for j = 1:20
     Sub_20189 = [];
-    for i = j:35:cT189-2
-        cycleRange = i:i+34;
+    for i = j:20:cT189-2
+        cycleRange = i:i+19;
         columnsToDelete = cycleRange > 549204;
         cycleRange(columnsToDelete) = [];
         dataRange = clickTable20189(cycleRange,:);
@@ -625,7 +625,7 @@ All_20189_Bins = synchronize(binEffort189,All_20189_Clicks,'regular','sum','Time
 Count20189IDX = (All_20189_Bins.Count < 5);
 All_20189_Bins.Count(Count20189IDX) = 0;
 
-for i = 1:35
+for i = 1:20
     variableName = ['Count_Sub',num2str(i)];
     All20189IDX = (All_20189_Bins.(variableName) < 5); %remove anything with less than 5 clicks in a bin
     All_20189_Bins.(variableName)(All20189IDX) = 0;

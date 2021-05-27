@@ -1,15 +1,15 @@
 %This code is used to plot data from OBIS Seamap.
 
-T = readtable('obis_seamap_dataset_280_points_csv.csv'); %Dataset 1 (Canadian Wildlife Service 1970s-1980s)
+T = readtable('C:\Users\nposd\Documents\GitHub\CanadianArctic\VisualData\obis_seamap_dataset_280_points_csv.csv'); %Dataset 1 (Canadian Wildlife Service 1970s-1980s)
 
-T2 = readtable('obis_seamap_dataset_1726_points_csv.csv'); %Dataset 2 (Happy Whale)
+T2 = readtable('C:\Users\nposd\Documents\GitHub\CanadianArctic\VisualData\obis_seamap_dataset_1726_points_csv.csv'); %Dataset 2 (Happy Whale)
 
 T3 = readtable('ExtractedVisuals_Flipped.csv'); %Extracted Visuals (data picking)
 T3.Var1 = -(T3.Var1);
 
 Davidson = readtable('Davidson_Thesis3_Flipped.csv'); %just the left side of the map
 
-table = T(200604:200631,:); %Dataset 1 (Sperm Whales only for Canadian Wildlife service dataset (1))
+table = T(201087:201133,:); %Dataset 1 (Sperm Whales only for Canadian Wildlife service dataset (1) - only keep the higher latitude sightings
 
 %Extract latitude and longitudes
 LatCanada = table.latitude; %Canadian Wildlife dataset

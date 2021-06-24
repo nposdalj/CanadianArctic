@@ -56,10 +56,14 @@ Dataset280_2 = Dataset280(idxlat,:);
 idxlon = find(Dataset280_2.LongStart <= -45);
 Dataset280_3 = Dataset280_2(idxlon,:);
 effort_280 = boundary(Dataset280_3.LatStart,Dataset280_3.LongStart);
+
+%% Reeves 1985 Stranding data
+% Reeves = readtable('C:\Users\nposd\Documents\GitHub\CanadianArctic\VisualData\Reeves1985.xlsx');
 %%
 %Plotting
 %Canadian Wildlife service dataset
 %below is the color of your markers, edit if needed
+J = [0.4 0.4 0.4]; %dark grey
 I = [0 0 1]; %lighter blue
 G = [0.4940, 0.1840, 0.5560]; %purple
 H = [0.6 0 0.6]; %pink;
@@ -100,10 +104,11 @@ r.DataTipTemplate.DataTipRows(end+1) = row;
 
 geoscatter(FrouinMouy.Var2,FrouinMouy.Var1,markSize,'.','MarkerEdgeColor',H);
 geoscatter(iNat.Var2,iNat.Var1,markSize,'.','MarkerEdgeColor',I);
+% geoscatter(Reeves.Latitude,Reeves.Longitude,markSize,'.','MarkerEdgeColor',J);
 geoscatter(LatHARP,LongHARP,markSize,'.','MarkerEdgeColor',F);
 geobasemap landcover
 
-[~,objh] = legend('HMAP','WSDB','PIROP','Happy Whale','IMR','NAFO','Frouin-Mouy','iNaturalist');
+[~,objh] = legend('HMAP','WSDB','PIROP','Happy Whale','IMR','NAFO','Frouin-Mouy','iNaturalist','Reeves');
 objh1 = findobj(objh,'type','patch');
 set(objh1,'MarkerSize',30);
 hold off

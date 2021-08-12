@@ -12,6 +12,7 @@ library(rnaturalearthdata)
 library(rgeos)
 library(GISTools)
 library(prettymapr)
+library(readbitmap)
 data(coastlineWorldFine)
 data(topoWorld)
 
@@ -98,7 +99,7 @@ plot(Inlet, image = TRUE, land = TRUE, lwd = 0.1,
 plot(Inlet, deep = 0, shallow = 0, step = 0,
      lwd = 0.4, add = TRUE)
 
-#Option 3
+#Option 3 - THIS IS THE VERSION I USED FOR THE PUBLICATION
 map("worldHires","Canada", xlim=c(-141,-53), ylim=c(40,85), col="gray90", fill=TRUE)
 
 #Option 4
@@ -111,22 +112,26 @@ mp()
 
 b = as.topo(Inlet)
 
+pdf("I:/.shortcut-targets-by-id/1lwxYjZ-5ScY65o65OfWCtYU-FpMLIpXS/Arctic_Sperm whales/figures/SmallSiteMap.pdf", width = 6, height = 7)
 mp()
 mapImage(b, col=oceColorsGebco, breaks=seq(-4000, 0, 500))
 mapPolygon(coastlineWorldFine, col='grey')
-mapPoints(-76.2, 72.7,  col = "blue", bg = "blue", lwd = 2) #HARP
+mapPoints(-76.2, 72.7,  col = "blue", bg = "blue", lwd = 1) #HARP
 mapText(-76.2, 72.7, "Pond Inlet", pos = 4, col = "blue")
-mapPoints(-76.55, 72.68,  col = "red", bg = "red", lwd = 2) #Other recorder
+mapPoints(-76.55, 72.68,  col = "red", bg = "red", lwd = 1) #Other recorder
 mapText(-76.55, 72.68, "Guys Bight", pos = 4, col = "red", offset = -4.5)
-mapScalebar(x = "topleft")
-addnortharrow(pos = "bottomright")
+mapScalebar(x = "topleft", lwd=1)
+addnortharrow(pos = "bottomright", scale = 0.5)
 mapGrid()
+dev.off()
 
-#Larger Plot using Option #4
+#Larger Plot using Option #4 - THIS IS THE VERSION I USED FOR THE PUBLICATION
+pdf("I:/.shortcut-targets-by-id/1lwxYjZ-5ScY65o65OfWCtYU-FpMLIpXS/Arctic_Sperm whales/figures/LargeSiteMap.pdf", width = 4, height = 4)
 par(mar=c(1.5, 1.5, 0.5, 0.5))
 mapPlot(coastlineWorldFine,
         longitudelim=c(-130,-70), latitudelim=c(40, 80),
         projection="+proj=lcc +lat_0=30 +lat_1=60 +lon_0=-100", col='gray')
+dev.off()
 
 theme_set(theme_bw())
 world = ne_countries(scale = "medium", returnclass = "sf")

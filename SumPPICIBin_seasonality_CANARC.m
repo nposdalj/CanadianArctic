@@ -14,6 +14,7 @@ manualDir = 'E:\Project_Sites\CANARC\Manual Logging\guysbight_log2.xls'; %locati
 manualEffort = 'E:\Project_Sites\CANARC\Manual Logging\GuysBight_Effort.xlsx'; %location of Guys Bight effort
 PlotSiteName = 'Pond Inlet in the Canadian Arctic';
 IceData = 'C:\Users\nposd\Documents\GitHub\CanadianArctic\SeaIceData_BaffinBay.csv';
+IceDataJJ = 'C:\Users\nposd\Documents\GitHub\CanadianArctic\CANARC_PI_2012-2021_20km_landMask_stats_datestr_fromJJ.csv';
 %% define subfolder that fit specified iteration
 if itnum > 1
    for id = 2: str2num(itnum) % iterate id times according to itnum

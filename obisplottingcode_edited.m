@@ -108,10 +108,11 @@ geoscatter(iNat.Var2,iNat.Var1,markSize,'.','MarkerEdgeColor',I);
 geoscatter(LatHARP,LongHARP,markSize,'.','MarkerEdgeColor',F);
 geobasemap landcover
 
-[~,objh] = legend('HMAP','WSDB','PIROP','Happy Whale','IMR','NAFO','Frouin-Mouy','iNaturalist','Reeves');
+[~,objh] = legend('HMAP','WSDB','PIROP','Happywhale','IMR','NAFO','Frouin-Mouy','iNaturalist','Recording Site');
 objh1 = findobj(objh,'type','patch');
 set(objh1,'MarkerSize',30);
 hold off
+exportgraphics(gcf,'I:\.shortcut-targets-by-id\1lwxYjZ-5ScY65o65OfWCtYU-FpMLIpXS\Arctic_Sperm whales\figures\OBIS_HighQuality.pdf','ContentType','vector','Resolution',300);
 
 %% Write tables for continuation in R
 writetable(HMAP5,'C:\Users\nposd\Documents\GitHub\CanadianArctic\VisualData\HMAP_R.csv');

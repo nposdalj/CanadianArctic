@@ -7,14 +7,15 @@ siteabrev = 'CANARC'; %abbreviation of site.
 sp = 'Pm'; % your species code
 itnum = '2'; % which iteration you are looking for
 srate = 200; % sample rate
-tpwsPath = 'E:\Project_Sites\CANARC\TPWS_120to125'; %directory of TPWS files
-effortXls = 'E:\Project_Sites\CANARC\Pm_Effort.xlsx'; % specify excel file with effort times
-saveDir = 'E:\Project_Sites\CANARC\Plots'; %specify directory to save files
-manualDir = 'E:\Project_Sites\CANARC\Manual Logging\guysbight_log2.xls'; %location of manual logging for Guys Bight
-manualEffort = 'E:\Project_Sites\CANARC\Manual Logging\GuysBight_Effort.xlsx'; %location of Guys Bight effort
+tpwsPath = 'I:\My Drive\Manuscripts\CANARC\data\CANARC_PI Analysis\TPWS_120to125'; %directory of TPWS files
+effortXls = 'I:\My Drive\Manuscripts\CANARC\data\CANARC_PI Analysis\Pm_Effort.xlsx'; % specify excel file with effort times
+saveDirFIGS = 'I:\My Drive\Manuscripts\CANARC\figures'; %specify directory to save files
+saveDirFILES = 'I:\My Drive\Manuscripts\CANARC\data\CANARC_PI Analysis\Worspace_Tables';
+manualDir = 'I:\My Drive\Manuscripts\CANARC\data\CANARC_PI Analysis\Manual Logging\guysbight_log2.xls'; %location of manual logging for Guys Bight
+manualEffort = 'I:\My Drive\Manuscripts\CANARC\data\CANARC_PI Analysis\Manual Logging\GuysBight_Effort.xlsx'; %location of Guys Bight effort
 PlotSiteName = 'Pond Inlet in the Canadian Arctic';
-IceData = 'C:\Users\nposd\Documents\GitHub\CanadianArctic\SeaIceData_BaffinBay.csv';
-IceDataJJ = 'C:\Users\nposd\Documents\GitHub\CanadianArctic\CANARC_PI_2012-2021_20km_landMask_stats_datestr_fromJJ.csv';
+IceData = 'I:\My Drive\Manuscripts\CANARC\data\Sea Ice\SeaIceData_BaffinBay.csv';
+IceDataJJ = 'I:\My Drive\Manuscripts\CANARC\data\Sea Ice\CANARC_PI_2012-2021_20km_landMask_stats_datestr_fromJJ.csv';
 %% define subfolder that fit specified iteration
 if itnum > 1
    for id = 2: str2num(itnum) % iterate id times according to itnum
@@ -122,7 +123,6 @@ binMonitEffort = sum(effort.roundbin);
 
 if er > 1
     binEffort = intervalToBinTimetable(effort.Start,effort.End,p); % convert intervals in bins when there is multiple lines of effort
-    binEffort.sec = binEffort.bin*(p.binDur*60);
 else
     binEffort = intervalToBinTimetable_Only1RowEffort(effort.Start,effort.End,p); % convert intervals in bins when there is only one line of effort
     binEffort.sec = binEffort.bin*(p.binDur*60);
@@ -131,7 +131,7 @@ end
 NktTkt = positiveCounts/secMonitEffort;
 NktTktbin = positiveBins/binMonitEffort;
 %% save workspace to avoid running previous parts again
-save([saveDir,'\',siteabrev,'_workspace125.mat']);
+save([saveDirFILES,'\',siteabrev,'_workspace125.mat']);
 %% load workspace
 load([saveDir,'\',siteabrev,'_workspace125.mat']);
 %% group data by 5min bins, days, weeks, and seasons
@@ -139,8 +139,8 @@ load([saveDir,'\',siteabrev,'_workspace125.mat']);
 binidx = (binData.Count >=5); %removes bins with less than 5 clicks
 binData.Count(binidx == 0) = NaN;
 binTable = synchronize(binData,binEffort);
-binTable.Properties.VariableNames{'bin'} = 'Effort_Bin';
-binTable.Properties.VariableNames{'sec'} = 'Effort_Sec';
+binTable.Properties.VariableNames{'effortBin'} = 'Effort_Bin';
+binTable.Properties.VariableNames{'effortSec'} = 'Effort_Sec';
 binTable.maxPP = [];
 binidx1 = (binTable.Count >= 5);
 [y,~]=size(binTable);
@@ -155,8 +155,8 @@ Bin = retime(binData(:,1),'daily','count'); % #bin per day
 dayData = synchronize(Click,Bin);
 dayEffort = retime(binEffort,'daily','sum');
 dayTable = synchronize(dayData,dayEffort);
-dayTable.Properties.VariableNames{'bin'} = 'Effort_Bin';
-dayTable.Properties.VariableNames{'sec'} = 'Effort_Sec';
+dayTable.Properties.VariableNames{'effortBin'} = 'Effort_Bin';
+dayTable.Properties.VariableNames{'effortSec'} = 'Effort_Sec';
 dayTable(~dayTable.Effort_Bin,:)=[]; %removes days with no effort, NOT days with no presence
 %% statistical methods from Diogou, et al. 2019 - by daily 5 min bins ** USE THIS **
 [pp,~]=size(dayTable);
@@ -217,7 +217,7 @@ dayTable.DutyClick(435:603) = dayTable.DutyClick(435:603)/0.4436; %this value ca
 NANidx = ismissing(dayTable(:,{'NormBin'}));
 dayTable{:,{'NormBin'}}(NANidx) = 0; %if there was effort, but no detections change the NormBin column to zero
 dayBinTAB = timetable2table(dayTable);
-writetable(dayBinTAB,[saveDir,'\',siteabrev,'_dayBinTAB125.csv']); %save table to .csv to continue stats in R F:\Seasonality\Kruskal_RankSumSTATS.R
+writetable(dayBinTAB,[saveDirFILES,'\',siteabrev,'_dayBinTAB125.csv']); %save table to .csv to continue stats in R F:\Seasonality\Kruskal_RankSumSTATS.R
 %% Loading the manual data from Guys Bight
 manDet = readtable(manualDir); %read manual detections as table
 
@@ -320,7 +320,7 @@ ylabel('Percent Effort')
 ylim([-0.01 1.01])
 col = [0 0 0];
 set(gcf,'defaultAxesColorOrder',[col;col])
-%% loading Ice data
+%% loading Ice data for all of Baffin Bay
 Ice = readtable(IceData);
 Ice.Year = floor(Ice.Date/100);
 Ice.month = floor(Ice.Date-Ice.Year*100);
@@ -333,6 +333,11 @@ dayTable2.Ice = IceD;
 
 IceW = interp1(monthTable.tbin,monthTable_Ice.Value,weekTable.tbin);
 weekTable.Ice = IceW;
+%% loading Ice data for Pond Inlet - that
+IcePI = readtable(IceDataJJ);
+IcePI.Properties.VariableNames{'Date'} = 'tbin';
+IcePI = table2timetable(IcePI);
+dayTable2_IcePI = join(dayTable2, IcePI);%join table
 %% Monthly Plot - 2 axis
 monthTable.Percent = monthTable2.Effort_Sec./2628288;
 monthTable.Percent(isnan(monthTable.Percent))=0;
@@ -505,9 +510,12 @@ monthly_Ice = [filePrefix,'_',p.speName,'monthlyPresence_seaIceExtent'];
 saveas(gcf,fullfile(saveDir,monthly_Ice),'png')
 
 %% save certain variables
+%All of Baffin Bay
 writetable(timetable2table(weekTable),[saveDir,'/WeeklyIceTable.xlsx']); %weekly sea ice
 writetable(timetable2table(dayTable2),[saveDir,'/DailyIceTable.xlsx']); %daily sea ice
 
+%Pond Inlet Daily Data
+writetable(timetable2table(dayTable2_IcePI),[saveDirFILES,'/DailyIceTablePI.xlsx']); %daily sea ice
 %% Testing for autocorrelation
 %All data
 dayTable2.DutyBin(isnan(dayTable2.DutyBin)) = 0; 
@@ -519,3 +527,6 @@ dayTable2(1:184,:) = [];
 dayTable2.DutyBin(isnan(dayTable2.DutyBin)) = 0; 
 ts = dayTable2.DutyBin;
 its_cont = IntegralTimeScaleCalc(ts);
+
+%% Save complete workspaces
+save([saveDirFILES,'\',siteabrev,'_SumPPICIBin_seasonality_workspace.mat']);

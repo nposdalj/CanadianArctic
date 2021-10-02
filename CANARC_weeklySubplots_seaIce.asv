@@ -235,5 +235,5 @@ title('2019')
 xlim([182 300])
 xlabel('Day of Year')
 % Save plot
-dailyfn = [filePrefix,'_DailySeaIcePI_Subplots'];
+dailyfn = [filePrefix,'_DailySeaIce_Subplots'];
 saveas(gcf,fullfile(SaveDir,dailyfn),'png')

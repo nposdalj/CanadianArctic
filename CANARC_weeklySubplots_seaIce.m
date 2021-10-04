@@ -200,7 +200,7 @@ bar(DayTable.Day(DayTable.Year==2015),DayTable.DutyBin(DayTable.Year==2015),'k')
 ylim([0 100])
 addaxis(DayTable.Day(DayTable.Year==2015),DayTable.Mean(DayTable.Year==2015),[0 100]);
 addaxis(DayTable.Day(DayTable.Year==2015),DayTable.Percent(DayTable.Year==2015),[-0.01 1.01],'.r');
-title('2015')
+%title('2015')
 xlim([182 300])
 subplot(5,1,2)
 bar(DayTable.Day(DayTable.Year==2016),DayTable.DutyBin(DayTable.Year==2016),'k'); %year 2016
@@ -208,7 +208,7 @@ ylim([0 100])
 addaxis(DayTable.Day(DayTable.Year==2016),DayTable.Mean(DayTable.Year==2016),[0 100]);
 addaxis(DayTable.Day(DayTable.Year==2016),DayTable.Percent(DayTable.Year==2016),[-0.01 1.01],'.r');
 xlim([182 300])
-title('2016')
+%title('2016')
 subplot(5,1,3)
 bar(DayTable.Day(DayTable.Year==2017),DayTable.DutyBin(DayTable.Year==2017),'k'); %year 2017
 ylim([0 100])
@@ -217,21 +217,21 @@ addaxis(DayTable.Day(DayTable.Year==2017),DayTable.Percent(DayTable.Year==2017),
 addaxislabel(1,'5-Minute Bins/Day')
 addaxislabel(2,'Sea Ice Extent (million square km)')
 addaxislabel(3,'Percent Effort')
-title('2017')
+%title('2017')
 xlim([182 300])
 subplot(5,1,4)
 bar(DayTable.Day(DayTable.Year==2018),DayTable.DutyBin(DayTable.Year==2018),'k');  %year 2018
 ylim([0 100])
 addaxis(DayTable.Day(DayTable.Year==2018),DayTable.Mean(DayTable.Year==2018),[0 100]);
 addaxis(DayTable.Day(DayTable.Year==2018),DayTable.Percent(DayTable.Year==2018),[-0.01 1.01],'.r');
-title('2018')
+%title('2018')
 xlim([182 300])
 subplot(5,1,5)
 bar(DayTable.Day(DayTable.Year==2019),DayTable.DutyBin(DayTable.Year==2019),'k');  %year 2019
 ylim([0 100])
 addaxis(DayTable.Day(DayTable.Year==2019),DayTable.Mean(DayTable.Year==2019),[0 100]);
 addaxis(DayTable.Day(DayTable.Year==2019),DayTable.Percent(DayTable.Year==2019),[-0.01 1.01],'.r');
-title('2019')
+%title('2019')
 xlim([182 300])
 xlabel('Day of Year')
 % Save plot

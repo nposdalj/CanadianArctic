@@ -164,6 +164,4 @@ MasterTable_YrMean = MasterTableTT(:,{'Latitude'});
 YrMean = retime(MasterTable_YrMean,'yearly','max');
 YrMean = rmmissing(YrMean);
 figure
-plot(YrMean.Year,YrMean.Latitude,'o');
-xlabel('Year')
-ylabel('Northernmost Spermwhale Observation');
+plot(YrMean.Year,YrMean.Latitude,'.');

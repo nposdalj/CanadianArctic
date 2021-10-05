@@ -24,6 +24,15 @@ idxlat = find(OBIS2.decimalLatitude >= 59.62);
 OBIS3 = OBIS2(idxlat,:);
 idxlon = find(OBIS3.decimalLongitude <= -45);
 OBIS4 = OBIS3(idxlon,:);
+
+%Fill in missing years
+OBIS4.year{53} = '2017';
+OBIS4.year{54} = '1972';
+OBIS4.year{17} = '2018';
+OBIS4.year{22} = '2012';
+OBIS4.year{24} = '2018';
+OBIS4.year{26} = '1975';
+OBIS4.year{30} = '1975';
 %% Adding Froun-Mouy and iNaturalist data
 FrouinMouy = readtable('I:\My Drive\Manuscripts\CANARC\data\Extracted_Visuals\VisualData_fromGitHub\FrouinMouy.csv');
 FrouinMouy.Var1 = -(FrouinMouy.Var1);
@@ -122,9 +131,9 @@ writetable(FrouinMouy,'I:\My Drive\Manuscripts\CANARC\data\Extracted_Visuals\Vis
 writetable(Dataset280_3,'I:\My Drive\Manuscripts\CANARC\data\Extracted_Visuals\VisualData_fromGitHub\Dataset280_R.csv');
 %% Create one table with date, lat, long, institution/citation
 %HMAP
-MasterTable = HMAP6(:,{'LAT','LON','EN_YEAR'});
-MasterTable.Properties.VariableNames = {'Latitude','Longitude','Year'};
-MasterTable.Source = repmat("HMAP", size(MasterTable.Latitude));
+Master = HMAP6(:,{'LAT','LON','EN_YEAR'});
+Master.Properties.VariableNames = {'Latitude','Longitude','Year'};
+Master.Source = repmat("HMAP", size(Master.Latitude));
 %OBIS
 OBISM = OBIS4(:,{'decimalLatitude','decimalLongitude','year','institutionCode'});
 OBISM.Properties.VariableNames = {'Latitude','Longitude','Year','Source'};
@@ -147,8 +156,8 @@ CWSM.Source = repmat("CWS", size(CWSM.Lat));
 CWSM.Properties.VariableNames = {'Latitude','Longitude','Year','Source'};
 CWSM.Year = year(CWSM.Year);
 
-MasterTable = [MasterTable;OBISM;FrouinMouy;iNat;WSDBM;CWSM];
-MasterTable = rmmissing(MasterTable);
+Master = [Master;OBISM;FrouinMouy;iNat;WSDBM;CWSM];
+MasterTable = rmmissing(Master);
 
 MasterTableTT = MasterTable(:,{'Year','Latitude','Longitude','Source'});
 MasterTableTT.Year = datetime(string(MasterTableTT.Year),'Format','yyyy');
@@ -167,3 +176,41 @@ figure
 plot(YrMean.Year,YrMean.Latitude,'o');
 xlabel('Year')
 ylabel('Northernmost Spermwhale Observation');
+
+%% OBIS map with size of marker indicating oldest to most recent observations 
+%add scale for plotting
+scale = (50:30:950)';
+YrMean.Scale = scale(1:30);
+%match scale with MasterTable
+GeoScat = join(MasterTableTT,YrMean);
+%below is the color of your markers, edit if needed
+J = [0.4 0.4 0.4]; %dark grey
+I = [0 0 1]; %lighter blue
+G = [0.4940, 0.1840, 0.5560]; %purple
+H = [0.6 0 0.6]; %pink;
+F = [0 0 0]; %black
+E = [0.75, 0.75, 0]; %mustard yellow
+D = [0 0.5 0]; %green
+C = [1 0.5 0]; %yellow
+B = [0.5 0 0]; %maroon
+A = [0 0 0.25]; %navy blue
+
+figure
+geoscatter(GeoScat.Latitude_MasterTableTT(string(GeoScat.Source) == 'HMAP'),GeoScat.Longitude(string(GeoScat.Source) == 'HMAP'),GeoScat.Scale(string(GeoScat.Source) == 'HMAP'),'.','MarkerEdgeColor',B);
+hold on
+geoscatter(GeoScat.Latitude_MasterTableTT(string(GeoScat.Source) == 'WSDB'),GeoScat.Longitude(string(GeoScat.Source) == 'WSDB'),GeoScat.Scale(string(GeoScat.Source) == 'WSDB'),'.','MarkerEdgeColor',E);
+geoscatter(GeoScat.Latitude_MasterTableTT(string(GeoScat.Source) == 'CWS'),GeoScat.Longitude(string(GeoScat.Source) == 'CWS'),GeoScat.Scale(string(GeoScat.Source) == 'CWS'),'.','MarkerEdgeColor',C);
+gg = geoplot(Dataset280_3.LatStart(effort_280),Dataset280_3.LongStart(effort_280),'Color',[1 0.5 0]);
+gg.Annotation.LegendInformation.IconDisplayStyle = 'off';
+geoscatter(GeoScat.Latitude_MasterTableTT(string(GeoScat.Source) == 'Happywhale.com'),GeoScat.Longitude(string(GeoScat.Source) == 'Happywhale.com'),GeoScat.Scale(string(GeoScat.Source) == 'Happywhale.com'),'.','MarkerEdgeColor',D);
+geoscatter(GeoScat.Latitude_MasterTableTT(string(GeoScat.Source) == 'IMR'),GeoScat.Longitude(string(GeoScat.Source) == 'IMR'),GeoScat.Scale(string(GeoScat.Source) == 'IMR'),'.','MarkerEdgeColor',A);
+geoscatter(GeoScat.Latitude_MasterTableTT(string(GeoScat.Source) == 'Northwest Atlantic Fisheries Organization (NAFO)'),GeoScat.Longitude(string(GeoScat.Source) == 'Northwest Atlantic Fisheries Organization (NAFO)'),GeoScat.Scale(string(GeoScat.Source) == 'Northwest Atlantic Fisheries Organization (NAFO)'),'.','MarkerEdgeColor',G);
+geoscatter(GeoScat.Latitude_MasterTableTT(string(GeoScat.Source) == 'Frouin-Mouy'),GeoScat.Longitude(string(GeoScat.Source) == 'Frouin-Mouy'),GeoScat.Scale(string(GeoScat.Source) == 'Frouin-Mouy'),'.','MarkerEdgeColor',H);
+geoscatter(GeoScat.Latitude_MasterTableTT(string(GeoScat.Source) == 'iNaturalist'),GeoScat.Longitude(string(GeoScat.Source) == 'iNaturalist'),GeoScat.Scale(string(GeoScat.Source) == 'iNaturalist'),'.','MarkerEdgeColor',I);
+geoscatter(LatHARP,LongHARP,markSize,'.','MarkerEdgeColor',F);
+geobasemap landcover
+
+[~,objh] = legend('HMAP','WSDB','PIROP','Happywhale','IMR','NAFO','Frouin-Mouy','Jones','Recording Site');
+objh1 = findobj(objh,'type','patch');
+set(objh1,'MarkerSize',30);
+hold off

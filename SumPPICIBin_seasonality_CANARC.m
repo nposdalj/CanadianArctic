@@ -10,7 +10,7 @@ srate = 200; % sample rate
 tpwsPath = 'I:\My Drive\Manuscripts\CANARC\data\CANARC_PI Analysis\TPWS_120to125'; %directory of TPWS files
 effortXls = 'I:\My Drive\Manuscripts\CANARC\data\CANARC_PI Analysis\Pm_Effort.xlsx'; % specify excel file with effort times
 saveDirFIGS = 'I:\My Drive\Manuscripts\CANARC\figures'; %specify directory to save files
-saveDirFILES = 'I:\My Drive\Manuscripts\CANARC\data\CANARC_PI Analysis\Worspace_Tables';
+saveDirFILES = 'I:\My Drive\Manuscripts\CANARC\data\CANARC_PI Analysis\Workspace_Tables';
 manualDir = 'I:\My Drive\Manuscripts\CANARC\data\CANARC_PI Analysis\Manual Logging\guysbight_log2.xls'; %location of manual logging for Guys Bight
 manualEffort = 'I:\My Drive\Manuscripts\CANARC\data\CANARC_PI Analysis\Manual Logging\GuysBight_Effort.xlsx'; %location of Guys Bight effort
 PlotSiteName = 'Pond Inlet in the Canadian Arctic';
@@ -528,5 +528,21 @@ dayTable2.DutyBin(isnan(dayTable2.DutyBin)) = 0;
 ts = dayTable2.DutyBin;
 its_cont = IntegralTimeScaleCalc(ts);
 
+%% Some Sea Ice Math + Presence of Sperm Whales
+PM_Presence_OnlyIDX = find(dayTable2_IcePI.Count_Bin > 1);
+PM_Presence_Only = dayTable2_IcePI(PM_Presence_OnlyIDX,:);
+PM_Presence_Only.Year = year(PM_Presence_Only.tbin);
+
+YearlyMedian = retime(PM_Presence_Only, 'yearly', @(x) median(x,'omitnan'));
+YearlyMean = retime(PM_Presence_Only, 'yearly', 'mean');
+YearlySTD = retime(PM_Presence_Only, 'yearly', @(x) std(x));
+
+Tiles2015 = prctile(PM_Presence_Only.Count_Bin(PM_Presence_Only.Year == 2015)',[25,50,75],'all');
+Tiles2016 = prctile(PM_Presence_Only.Count_Bin(PM_Presence_Only.Year == 2016)',[25,50,75],'all');
+Tiles2017 = prctile(PM_Presence_Only.Count_Bin(PM_Presence_Only.Year == 2017)',[25,50,75],'all');
+Tiles2018 = prctile(PM_Presence_Only.Count_Bin(PM_Presence_Only.Year == 2018)',[25,50,75],'all');
+Tiles2019 = prctile(PM_Presence_Only.Count_Bin(PM_Presence_Only.Year == 2019)',[25,50,75],'all');
+
+boxplot(PM_Presence_Only.Count_Bin,PM_Presence_Only.Year) %also has median and percentiles
 %% Save complete workspaces
 save([saveDirFILES,'\',siteabrev,'_SumPPICIBin_seasonality_workspace.mat']);

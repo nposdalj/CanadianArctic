@@ -15,17 +15,17 @@ siteabrev = 'CANARC'; %abbreviation of site.
 sp = 'Pm'; % your species code
 itnum = '2'; % which iteration you are looking for
 srate = 200; % sample rate
-tpwsPath = 'E:\Project_Sites\CANARC\TPWS_120to125'; %directory of TPWS files
-effortXls = 'E:\Project_Sites\CANARC\Pm_Effort.xlsx'; % specify excel file with effort times
-saveDir = 'E:\Project_Sites\CANARC\Plots'; %specify directory to save files
+tpwsPath = 'I:\My Drive\Manuscripts\CANARC\data\CANARC_PI Analysis\TPWS_120to125'; %directory of TPWS files
+effortXls = 'I:\My Drive\Manuscripts\CANARC\data\CANARC_PI Analysis\Pm_Effort.xlsx'; % specify excel file with effort times
+saveDir = 'I:\My Drive\Manuscripts\CANARC\data\CANARC_PI Analysis\Workspace_Tables'; %specify directory to save files
 load([saveDir,'\',siteabrev,'_workspace125.mat']); %load workspace from sumPPICIbin_seasonality code
 %% group data by 5min bins, days, weeks, and seasons
 %group data by 5 minute bins
 binDataIDX = (binData.Count < 5); %remove anything with less than 5 clicks in a bin
 binData.Count(binDataIDX) = 0;
 binTable = synchronize(binData,binEffort);
-binTable.Properties.VariableNames{'bin'} = 'Effort_Bin';
-binTable.Properties.VariableNames{'sec'} = 'Effort_Sec';
+binTable.Properties.VariableNames{'effortBin'} = 'Effort_Bin';
+binTable.Properties.VariableNames{'effortSec'} = 'Effort_Sec';
 binTable.maxPP = [];
 %binidx1 = (binTable.Count < 5);
 %binTable.Count(binidx1) = 0;
@@ -48,8 +48,8 @@ dayData = synchronize(Click,Bin);
 dayEffort = retime(binEffort,'daily','sum');
 dayTab = synchronize(dayData,dayEffort);
 dayTable = synchronize(dayData,dayEffort);
-dayTable.Properties.VariableNames{'bin'} = 'Effort_Bin';
-dayTable.Properties.VariableNames{'sec'} = 'Effort_Sec';
+dayTable.Properties.VariableNames{'effortBin'} = 'Effort_Bin';
+dayTable.Properties.VariableNames{'effortSec'} = 'Effort_Sec';
 dayTableZeros = dayTable;
 [y,~]=size(dayTable);
 dayTable.PreAbs = zeros(y,1);

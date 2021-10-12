@@ -15,9 +15,9 @@ siteabrev = 'CANARC'; %abbreviation of site.
 sp = 'Pm'; % your species code
 itnum = '2'; % which iteration you are looking for
 srate = 200; % sample rate
-tpwsPath = 'I:\My Drive\Manuscripts\CANARC\data\CANARC_PI Analysis\TPWS_120to125'; %directory of TPWS files
-effortXls = 'I:\My Drive\Manuscripts\CANARC\data\CANARC_PI Analysis\Pm_Effort.xlsx'; % specify excel file with effort times
-saveDir = 'I:\My Drive\Manuscripts\CANARC\data\CANARC_PI Analysis\Workspace_Tables'; %specify directory to save files
+tpwsPath = 'O:\My Drive\Manuscripts\CANARC\data\CANARC_PI Analysis\TPWS_120to125'; %directory of TPWS files
+effortXls = 'O:\My Drive\Manuscripts\CANARC\data\CANARC_PI Analysis\Pm_Effort.xlsx'; % specify excel file with effort times
+saveDir = 'O:\My Drive\Manuscripts\CANARC\data\CANARC_PI Analysis\Workspace_Tables'; %specify directory to save files
 load([saveDir,'\',siteabrev,'_workspace125.mat']); %load workspace from sumPPICIbin_seasonality code
 %% group data by 5min bins, days, weeks, and seasons
 %group data by 5 minute bins
@@ -542,14 +542,17 @@ title('Histogram of Missed Clicks in 5-Minute Bins in 2016')
 xlabel('# of Missed Clicks in Each 5-Min Bin')
 ylabel('Count')
 
+%Remove infinity
+All_2016_Bins.DutyPercent(isinf(All_2016_Bins.DutyPercent)) = NaN;
+
 %Average Duty cycle
-Mean_2016 = nanmean(All_2016_Bins.DutyPercent);
+Mean_2016 = mean(All_2016_Bins.DutyPercent,'omitnan');
 Avg2016_DutyCycle = ['The average duty cycle for 2016 was ',num2str(Mean_2016)];
 disp(Avg2016_DutyCycle)
 
 %Average # of days with sperm whales 
 %retime bin table for daily
-columnIndices2Delete = [1 38 39 40 41 42 43];
+columnIndices2Delete = [25 26 27 28 29 30];
 All_2016_BinsINT = All_2016_Bins;
 All_2016_BinsINT(:,columnIndices2Delete) = [];
 All_2016_Days = retime(All_2016_BinsINT,'daily','sum');
@@ -578,8 +581,11 @@ title('Histogram of Missed 5-Minute Bins each day in 2016')
 xlabel('# of Missed 5-Min Bins Each Day')
 ylabel('Count')
 
+%Remove infinity
+All_2016_Days.DutyPercent(isinf(All_2016_Days.DutyPercent)) = NaN;
+
 %Average Duty cycle
-Mean_2016 = nanmean(All_2016_Days.DutyPercent);
+Mean_2016 = mean(All_2016_Days.DutyPercent,'omitnan');
 Avg2016_DutyCycle = ['The average duty cycle for 2016 was ',num2str(Mean_2016)];
 disp(Avg2016_DutyCycle)
 
@@ -654,14 +660,17 @@ title('Histogram of Missed Clicks in 5-Minute Bins in 2018/2019')
 xlabel('# of Missed Clicks in Each 5-Min Bin')
 ylabel('Count')
 
+%Remove infinity
+All_20189_Bins.DutyPercent(isinf(All_20189_Bins.DutyPercent)) = NaN;
+
 %Average Duty cycle
-Mean_20189 = nanmean(All_20189_Bins.DutyPercent);
+Mean_20189 = mean(All_20189_Bins.DutyPercent,'omitnan');
 Avg20189_DutyCycle = ['The average duty cycle for 2018/2019 was ',num2str(Mean_20189)];
 disp(Avg20189_DutyCycle)
 
 %Average # of days with sperm whales 
 %retime bin table for daily
-columnIndices2Delete = [1 38 39 40 41 42 43];
+columnIndices2Delete = [25 26 27 28 29 30];
 All_20189_BinsINT = All_20189_Bins;
 All_20189_BinsINT(:,columnIndices2Delete) = [];
 All_20189_Days = retime(All_20189_BinsINT,'daily','sum');
@@ -690,8 +699,11 @@ title('Histogram of Missed 5-Minute Bins each day in 2018/2019')
 xlabel('# of Missed 5-Min Bins Each Day')
 ylabel('Count')
 
+%Remove infinity
+All_20189_Days.DutyPercent(isinf(All_20189_Days.DutyPercent)) = NaN;
+
 %Average Duty cycle
-Mean_20189 = nanmean(All_20189_Days.DutyPercent);
+Mean_20189 = mean(All_20189_Days.DutyPercent,'omitnan');
 Avg20189_DutyCycle = ['The average duty cycle for 2018/2019 was ',num2str(Mean_20189)];
 disp(Avg20189_DutyCycle)
 

@@ -1,3 +1,5 @@
+%% saveDir
+saveDir = 'I:\My Drive\Manuscripts\CANARC\data\Extracted_Visuals';
 %% Adding HMAP data
 HMAP = readtable('I:\My Drive\Manuscripts\CANARC\data\Extracted_Visuals\VisualData_fromGitHub\Full_Dataset4.csv');
 IDX = find(contains(HMAP.Dataset4_SPECIES,'Sperm'));
@@ -338,3 +340,5 @@ for n=1:96
     hold on
 end
 
+%% save table as .csv
+writetable(timetable2table(GeoScat),[saveDir,'/SightingData_Compiled.xlsx']); %daily sea ice

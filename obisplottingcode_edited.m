@@ -1,7 +1,7 @@
 %% saveDir
-saveDir = 'I:\My Drive\Manuscripts\CANARC\data\Extracted_Visuals';
+saveDir = 'H:\My Drive\Manuscripts\CANARC\data\Extracted_Visuals';
 %% Adding HMAP data
-HMAP = readtable('I:\My Drive\Manuscripts\CANARC\data\Extracted_Visuals\VisualData_fromGitHub\Full_Dataset4.csv');
+HMAP = readtable('H:\My Drive\Manuscripts\CANARC\data\Extracted_Visuals\VisualData_fromGitHub\Full_Dataset4.csv');
 IDX = find(contains(HMAP.Dataset4_SPECIES,'Sperm'));
 HMAP2 = HMAP(IDX,{'LAT','LON','GROUND','EN_YEAR'});
 
@@ -16,7 +16,7 @@ idxlon = find(HMAP3.LON <= -45);
 HMAP5 = HMAP4(idxlon,:);
 HMAP6 = unique(HMAP5);
 %% Adding OBIS data
-OBIS = readtable('I:\My Drive\Manuscripts\CANARC\data\Extracted_Visuals\VisualData_fromGitHub\OBIS.csv');
+OBIS = readtable('H:\My Drive\Manuscripts\CANARC\data\Extracted_Visuals\VisualData_fromGitHub\OBIS.csv');
 IDX3 = find(contains(OBIS.institutionCode,'HMAP'));
 OBIS2 = OBIS;
 OBIS2(IDX3,:) = [];
@@ -42,15 +42,15 @@ OBIS4.year{24} = '2018';
 OBIS4.year{26} = '1975';
 OBIS4.year{30} = '1975';
 %% Adding Froun-Mouy and iNaturalist data
-FrouinMouy = readtable('I:\My Drive\Manuscripts\CANARC\data\Extracted_Visuals\VisualData_fromGitHub\FrouinMouy.csv');
+FrouinMouy = readtable('H:\My Drive\Manuscripts\CANARC\data\Extracted_Visuals\VisualData_fromGitHub\FrouinMouy.csv');
 FrouinMouy.Var1 = -(FrouinMouy.Var1);
 
-iNat = readtable('I:\My Drive\Manuscripts\CANARC\data\Extracted_Visuals\VisualData_fromGitHub\iNat.csv');
+iNat = readtable('H:\My Drive\Manuscripts\CANARC\data\Extracted_Visuals\VisualData_fromGitHub\iNat.csv');
 iNat.Var1 = -(iNat.Var1);
 %% Adding WSDB Data
-WSDB = readtable('I:\My Drive\Manuscripts\CANARC\data\Extracted_Visuals\VisualData_fromGitHub\WSDB_SpermWhale_May2021.xlsx');
+WSDB = readtable('H:\My Drive\Manuscripts\CANARC\data\Extracted_Visuals\VisualData_fromGitHub\WSDB_SpermWhale_May2021.xlsx');
 %% Adding CWS data
-CWS = readtable('I:\My Drive\Manuscripts\CANARC\data\Extracted_Visuals\VisualData_fromGitHub\q SPWH sightings.xlsx');
+CWS = readtable('H:\My Drive\Manuscripts\CANARC\data\Extracted_Visuals\VisualData_fromGitHub\q SPWH sightings.xlsx');
 idxlat = find(CWS.Lat >= 59.62);
 CWS2 = CWS(idxlat,:);
 idxlon = find(CWS2.Long <= -45);
@@ -60,14 +60,14 @@ CWS3 = CWS2(idxlon,:);
 LatHARP = 72.72;
 LongHARP = -76.23;
 %% Dataset 280 effort
-Dataset280 = readtable('I:\My Drive\Manuscripts\CANARC\data\Extracted_Visuals\VisualData_fromGitHub\obis_seamap_dataset_280_points.csv');
+Dataset280 = readtable('H:\My Drive\Manuscripts\CANARC\data\Extracted_Visuals\VisualData_fromGitHub\obis_seamap_dataset_280_points.csv');
 idxlat = find(Dataset280.latitude >= 59.62);
 Dataset280_2 = Dataset280(idxlat,:);
 idxlon = find(Dataset280_2.longitude <= -45);
 Dataset280_3 = Dataset280_2(idxlon,:);
 effort_280 = boundary(Dataset280_3.latitude,Dataset280_3.longitude);
 
-Dataset280 = readtable('I:\My Drive\Manuscripts\CANARC\data\Extracted_Visuals\VisualData_fromGitHub\q survey effort_2.xlsx');
+Dataset280 = readtable('H:\My Drive\Manuscripts\CANARC\data\Extracted_Visuals\VisualData_fromGitHub\q survey effort_2.xlsx');
 idxlat = find(Dataset280.LatStart >= 59.62);
 Dataset280_2 = Dataset280(idxlat,:);
 idxlon = find(Dataset280_2.LongStart <= -45);

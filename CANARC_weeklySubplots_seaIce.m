@@ -13,18 +13,19 @@ close all
 clear all
 
 %% Specity directories
-SaveDir = 'I:\My Drive\Manuscripts\CANARC\figures'; %where the xlsx documents are saved
+GDrive = 'H';
+SaveDir = [GDrive,':\My Drive\Manuscripts\CANARC\figures']; %where the xlsx documents are saved
 filePrefix = 'CANARC_PI'; %site name for plots
 %% load necessary files
-DayTable = table2timetable(readtable('I:\My Drive\Manuscripts\CANARC\data\CANARC_PI Analysis\Workspace_Tables\DailyIceTable.xlsx'));
+DayTable = table2timetable(readtable([GDrive,':\My Drive\Manuscripts\CANARC\data\CANARC_PI Analysis\Workspace_Tables\DailyIceTable.xlsx']));
 DayTable.Day = day(DayTable.tbin,'dayofyear');
 DayTable.Year = year(DayTable.tbin);
-WeekTable = table2timetable(readtable('I:\My Drive\Manuscripts\CANARC\data\CANARC_PI Analysis\Workspace_Tables\WeeklyIceTable.xlsx'));
+WeekTable = table2timetable(readtable([GDrive,':\My Drive\Manuscripts\CANARC\data\CANARC_PI Analysis\Workspace_Tables\WeeklyIceTable.xlsx']));
 WeekTable.Week = week(WeekTable.tbin);
 WeekTable.Year = year(WeekTable.tbin);
 
 %%Load PI Ice Data
-DayTable = table2timetable(readtable('I:\My Drive\Manuscripts\CANARC\data\CANARC_PI Analysis\Workspace_Tables\DailyIceTablePI.xlsx'));
+DayTable = table2timetable(readtable([GDrive,':\My Drive\Manuscripts\CANARC\data\CANARC_PI Analysis\Workspace_Tables\DailyIceTablePI.xlsx']));
 DayTable.Day = day(DayTable.tbin,'dayofyear');
 DayTable.Year = year(DayTable.tbin);
 %%
@@ -236,4 +237,53 @@ xlim([182 300])
 xlabel('Day of Year')
 % Save plot
 dailyfn = [filePrefix,'_DailySeaIcePI_Subplots'];
+saveas(gcf,fullfile(SaveDir,dailyfn),'png')
+
+%% Adding SeaIce from the Pond Inlet only to plots
+%Per suggestions changing effort to open circles
+effort = [0.4660 0.6740 0.1880]; %light green color
+%daily
+figure
+%sgtitle({'Daily Bin Counts in Pond Inlet', '2015-2019 with Sea Ice Concentration'})
+subplot(5,1,1)
+bar(DayTable.Day(DayTable.Year==2015),DayTable.DutyBin(DayTable.Year==2015),'k'); %year 2015
+ylim([0 100])
+addaxis(DayTable.Day(DayTable.Year==2015),DayTable.Mean(DayTable.Year==2015),[0 100],'blue','LineWidth',1.5);
+addaxis(DayTable.Day(DayTable.Year==2015),DayTable.Percent(DayTable.Year==2015),[-0.01 1.01],'.','Color',effort);
+%title('2015')
+xlim([182 300])
+subplot(5,1,2)
+bar(DayTable.Day(DayTable.Year==2016),DayTable.DutyBin(DayTable.Year==2016),'k'); %year 2016
+ylim([0 100])
+addaxis(DayTable.Day(DayTable.Year==2016),DayTable.Mean(DayTable.Year==2016),[0 100],'blue','LineWidth',1);
+addaxis(DayTable.Day(DayTable.Year==2016),DayTable.Percent(DayTable.Year==2016),[-0.01 1.01],'.','Color',effort);
+xlim([182 300])
+%title('2016')
+subplot(5,1,3)
+bar(DayTable.Day(DayTable.Year==2017),DayTable.DutyBin(DayTable.Year==2017),'k'); %year 2017
+ylim([0 100])
+addaxis(DayTable.Day(DayTable.Year==2017),DayTable.Mean(DayTable.Year==2017),[0 100],'blue','LineWidth',1);
+addaxis(DayTable.Day(DayTable.Year==2017),DayTable.Percent(DayTable.Year==2017),[-0.01 1.01],'.','Color',effort);
+addaxislabel(1,'5-Minute Bins/Day')
+addaxislabel(2,'Sea Ice Extent (million square km)')
+addaxislabel(3,'Percent Effort')
+%title('2017')
+xlim([182 300])
+subplot(5,1,4)
+bar(DayTable.Day(DayTable.Year==2018),DayTable.DutyBin(DayTable.Year==2018),'k');  %year 2018
+ylim([0 100])
+addaxis(DayTable.Day(DayTable.Year==2018),DayTable.Mean(DayTable.Year==2018),[0 100],'blue','LineWidth',1);
+addaxis(DayTable.Day(DayTable.Year==2018),DayTable.Percent(DayTable.Year==2018),[-0.01 1.01],'.','Color',effort);
+%title('2018')
+xlim([182 300])
+subplot(5,1,5)
+bar(DayTable.Day(DayTable.Year==2019),DayTable.DutyBin(DayTable.Year==2019),'k');  %year 2019
+ylim([0 100])
+addaxis(DayTable.Day(DayTable.Year==2019),DayTable.Mean(DayTable.Year==2019),[0 100],'blue','LineWidth',1);
+addaxis(DayTable.Day(DayTable.Year==2019),DayTable.Percent(DayTable.Year==2019),[-0.01 1.01],'.','Color',effort);
+%title('2019')
+xlim([182 300])
+xlabel('Day of Year')
+% Save plot
+dailyfn = [filePrefix,'_DailySeaIcePI_Subplots_BlueGreen'];
 saveas(gcf,fullfile(SaveDir,dailyfn),'png')

@@ -187,7 +187,7 @@ ylabel('Northernmost Spermwhale Observation');
 %each year is a different size
 %add scale for plotting
 scale = (50:30:950)';
-YrMean.Scale = scale(1:31);
+YrMean.Scale = scale(1:30);
 %match scale with MasterTable
 GeoScat = join(MasterTableTT,YrMean);
 
@@ -198,7 +198,7 @@ scale = (50:45:290)'; %6 colors only
 GeoScat_sorted = sortrows(GeoScat);
 [Y,E] = discretize(GeoScat_sorted.Year,6); %make 5 bins based on year
 GeoScat_sorted.SizeVal = Y;
-GeoScat_sorted.Scale = zeros(203,1);
+GeoScat_sorted.Scale = zeros(200,1);
 
 %add size to each observation based on the date
 for n = 1:length
@@ -229,7 +229,7 @@ geoscatter(GeoScat.Latitude_MasterTableTT(string(GeoScat.Source) == 'Happywhale.
 geoscatter(GeoScat.Latitude_MasterTableTT(string(GeoScat.Source) == 'IMR'),GeoScat.Longitude(string(GeoScat.Source) == 'IMR'),GeoScat.Scale(string(GeoScat.Source) == 'IMR'),'.','MarkerEdgeColor',A);
 geoscatter(GeoScat.Latitude_MasterTableTT(string(GeoScat.Source) == 'Northwest Atlantic Fisheries Organization (NAFO)'),GeoScat.Longitude(string(GeoScat.Source) == 'Northwest Atlantic Fisheries Organization (NAFO)'),GeoScat.Scale(string(GeoScat.Source) == 'Northwest Atlantic Fisheries Organization (NAFO)'),'.','MarkerEdgeColor',G);
 geoscatter(GeoScat.Latitude_MasterTableTT(string(GeoScat.Source) == 'Frouin-Mouy'),GeoScat.Longitude(string(GeoScat.Source) == 'Frouin-Mouy'),GeoScat.Scale(string(GeoScat.Source) == 'Frouin-Mouy'),'.','MarkerEdgeColor',H);
-geoscatter(GeoScat.Latitude_MasterTableTT(string(GeoScat.Source) == 'Lefort'),GeoScat.Longitude(string(GeoScat.Source) == 'Lefort'),GeoScat.Scale(string(GeoScat.Source) == 'Lefort'),'.','MarkerEdgeColor',I);
+geoscatter(GeoScat.Latitude_MasterTableTT(string(GeoScat.Source) == 'iNaturalist'),GeoScat.Longitude(string(GeoScat.Source) == 'iNaturalist'),GeoScat.Scale(string(GeoScat.Source) == 'iNaturalist'),'.','MarkerEdgeColor',I);
 geoscatter(LatHARP,LongHARP,markSize,'.','MarkerEdgeColor',F);
 geobasemap landcover
 
@@ -241,7 +241,7 @@ hold off
 %each year is a different size
 %add scale for plotting
 scale = (50:30:950)';
-YrMean.Scale = scale(1:31);
+YrMean.Scale = scale(1:30);
 %match scale with MasterTable
 GeoScat = join(MasterTableTT,YrMean);
 
@@ -268,7 +268,7 @@ geoscatter(GeoScat.Latitude_MasterTableTT(string(GeoScat.Source) == 'Happywhale.
 geoscatter(GeoScat.Latitude_MasterTableTT(string(GeoScat.Source) == 'IMR'),GeoScat.Longitude(string(GeoScat.Source) == 'IMR'),GeoScat.Scale(string(GeoScat.Source) == 'IMR'),'.','MarkerEdgeColor',A);
 geoscatter(GeoScat.Latitude_MasterTableTT(string(GeoScat.Source) == 'Northwest Atlantic Fisheries Organization (NAFO)'),GeoScat.Longitude(string(GeoScat.Source) == 'Northwest Atlantic Fisheries Organization (NAFO)'),GeoScat.Scale(string(GeoScat.Source) == 'Northwest Atlantic Fisheries Organization (NAFO)'),'.','MarkerEdgeColor',G);
 geoscatter(GeoScat.Latitude_MasterTableTT(string(GeoScat.Source) == 'Frouin-Mouy'),GeoScat.Longitude(string(GeoScat.Source) == 'Frouin-Mouy'),GeoScat.Scale(string(GeoScat.Source) == 'Frouin-Mouy'),'.','MarkerEdgeColor',H);
-geoscatter(GeoScat.Latitude_MasterTableTT(string(GeoScat.Source) == 'Lefort'),GeoScat.Longitude(string(GeoScat.Source) == 'Lefort'),GeoScat.Scale(string(GeoScat.Source) == 'Lefort'),'.','MarkerEdgeColor',I);
+geoscatter(GeoScat.Latitude_MasterTableTT(string(GeoScat.Source) == 'iNaturalist'),GeoScat.Longitude(string(GeoScat.Source) == 'iNaturalist'),GeoScat.Scale(string(GeoScat.Source) == 'iNaturalist'),'.','MarkerEdgeColor',I);
 geoscatter(LatHARP,LongHARP,markSize,'.','MarkerEdgeColor',F);
 geobasemap landcover
 
@@ -284,7 +284,7 @@ scale = (50:45:290)'; %6 colors only
 GeoScat_sorted = sortrows(GeoScat);
 [Y,E] = discretize(GeoScat_sorted.Year,6); %make 5 bins based on year
 GeoScat_sorted.SizeVal = Y;
-GeoScat_sorted.Size = zeros(203,1);
+GeoScat_sorted.Size = zeros(200,1);
 colors = distinguishable_colors(9);
 
 %add size to each observation based on the date
@@ -312,7 +312,7 @@ colors_p = [linspace(red(1),pink(1),length)', linspace(red(2),pink(2),length)', 
 GeoScat_sorted = sortrows(GeoScat);
 [Y,E] = discretize(GeoScat_sorted.Year,6); %make 5 bins based on year
 GeoScat_sorted.ColVal = Y;
-GeoScat_sorted.Color = zeros(203,3);
+GeoScat_sorted.Color = zeros(200,3);
 
 %add color bar to each observation based on the date
 for n = 1:length
@@ -321,7 +321,7 @@ GeoScat_sorted.Color(GeoScat_sorted.ColVal == n,:) = repmat(colors_p(n,:),II,1);
 end
 
 figure
-for n=1:203
+for n=1:200
     geoscatter(GeoScat_sorted.Latitude_MasterTableTT(n),GeoScat_sorted.Longitude(n),markSize,'.','MarkerEdgeColor',GeoScat_sorted.Color(n,:))
     hold on
 end

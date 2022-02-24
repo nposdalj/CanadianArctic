@@ -10,10 +10,19 @@ LongHarp360 = 360 + LongHARP;
 %% Find cells that are within the radius
 [deg,~] = distance(LatHARP,LongHarp360, SeaIce.latitude, SeaIce.longitude);
 D = deg2km(deg);
-I=find(D<12); %12 is the smallest distance away from the center that I can do, this only includes one lat/lon point
+I=find(D<20); %12 is the smallest distance away from the center that I can do, this includes the two nearest lat/lon point
 
 SeaIce_Range = SeaIce(I,:); %index to find the lat/lon of interest
 
+%% Plotting points
+UniqueLatLon = unique(SeaIce_Range(:,2:3));
+
+figure
+plot(UniqueLatLon.latitude,UniqueLatLon.longitude,'o') %USED
+hold on
+plot(LatHARP,LongHarp360,'.')
+
+%% Continuing to find cells within radius
 %Convert time to datetime
 b=regexp(SeaIce_Range.time,'\T','split');
 b=[b{:}];
@@ -215,6 +224,13 @@ title('Decadal Median Sea Ice Concentration')
 weeklyfn = 'Decadal_MedianSIC_ViolinPlots';
 saveas(gcf,fullfile(SaveDir,weeklyfn),'png')
 
+%% Take decadal data and find min per year
+Zeros = find(SeaIce_Avg.concentration==0);
+ZeroTable = SeaIce_Avg(Zeros,:);
+ZeroTable = timetable2table(ZeroTable);
+[ZeroTable.Yr,~,~] = ymd(ZeroTable.Var1);
+
 %% Save tables
 writetimetable(SeaIce_Avg,'H:\My Drive\Manuscripts\CANARC\data\Sea Ice\SeaIce_Range_Avg.csv');
 writetimetable(SeaIce_Median,'H:\My Drive\Manuscripts\CANARC\data\Sea Ice\SeaIce_Range_Median.csv');
+writetable(ZeroTable,'H:\My Drive\Manuscripts\CANARC\data\Sea Ice\SeaIce_Range_Zero.csv');

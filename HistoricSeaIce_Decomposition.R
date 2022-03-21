@@ -108,7 +108,7 @@ summary(LM_SIC)
 #### PLOTS FOR PUBLICATION #######
 ggplot(SeaIceMed_1901, aes(x=yr, y=concentration))+
   geom_point() + geom_smooth(method="lm", col="black") + theme_bw()+
-  stat_regline_equation(label.x = 1990, label.y = 92)+
+  #stat_regline_equation(label.x = 1990, label.y = 92)+
   labs(x = "Year",
        y = "Median Sea Ice Concentration (%)")+ theme(axis.text=element_text(size=15),
                                                   axis.title=element_text(size=16,face="bold"))+
@@ -119,9 +119,9 @@ ggplot(SeaIceMed_1901, aes(x=yr, y=concentration))+
 decades = c("1910","1930","1950","1970","1990","2010")
 decbreaks = c(7,9,11,13,15,17)
 ggplot(Min_1901, aes(x=group)) + geom_histogram() + geom_bar(width = 0.9) + theme_bw()+scale_x_continuous(breaks=decbreaks, labels=decades)+
-  labs(x = "Decades",
+  labs(x = "Decade",
        y = "Number of Months")+ theme(axis.text=element_text(size=15),
-                                                      axis.title=element_text(size=16,face="bold"))+
-  ggtitle("Number of Months with a Mid-Month Day \n Average Sea Ice Concentration of Zero") +
-  theme(plot.title = element_text(hjust = 0.5,size=16,face="bold"))
+                                                      axis.title=element_text(size=16,face="bold"))+ scale_y_reverse()
+  #ggtitle("Number of Months with a Mid-Month Day \n Average Sea Ice Concentration of Zero") +
+  #theme(plot.title = element_text(hjust = 0.5,size=16,face="bold"))
 

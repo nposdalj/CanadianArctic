@@ -12,8 +12,8 @@ library(ggbreak)
 library(patchwork)
 
 #Load Sea Ice Data from Matlab (Averaged by source)
-SeaIce = read.csv('H:/My Drive/Manuscripts/CANARC/data/Sea Ice/SeaIce_Range_Avg.csv')
-Min = read.csv('H:/My Drive/Manuscripts/CANARC/data/Sea Ice/SeaIce_Range_Zero.csv')
+SeaIce = read.csv('G:/My Drive/Manuscripts/CANARC/data/Sea Ice/SeaIce_Range_Avg.csv')
+Min = read.csv('G:/My Drive/Manuscripts/CANARC/data/Sea Ice/SeaIce_Range_Zero.csv')
 
 #Create timeseries with 1979 and beyond
 SeaIce_1979 = SeaIce[which(SeaIce$yr >= 1979),]
@@ -74,7 +74,7 @@ seasonplot(ts.sa, 12, col=rainbow(12), year.labels=TRUE, main="Seasonal plot: SI
 
 ###################################
 #Load Median SIC data from Matlab (averaged by source)
-SeaIceMed = read.csv('H:/My Drive/Manuscripts/CANARC/data/Sea Ice/SeaIce_Range_Median.csv')
+SeaIceMed = read.csv('G:/My Drive/Manuscripts/CANARC/data/Sea Ice/SeaIce_Range_Median.csv')
 
 ## FULL DATA
 plot(SeaIceMed$yr,SeaIceMed$concentration)
